@@ -26,7 +26,7 @@ public class XyahLibrary : ModuleRules
 			new string[]
 			{
 				"Core",
-				"CoreUObject"
+				"CoreUObject",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -35,7 +35,6 @@ public class XyahLibrary : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore",
