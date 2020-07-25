@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "../XyahLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahUtilityLibrary.generated.h"
 
@@ -37,6 +37,16 @@ protected:
 //Blueprints & C++ 
 public:
 
+	/*
+	Gets the Class Default Object, as Mutable (use with Care!)
+	@param ObjectClass - The class to get the Default Object from
+	@param OutObject - Reference to the Default Object
+	*/
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "ObjectClass", DynamicOutputParam = "OutObject"))
+	static void GetClassDefaultObject(TSubclassOf<UObject> ObjectClass, UObject*& OutObject);
+
+
+
 	/* 
 	Prints a String to either the Screen, Log, or both. 
 	@param InString - The String to Print
@@ -50,10 +60,10 @@ public:
 	@param TextScale - the Scale of the Text (default 1.f)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly))
-		static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library")), int32 LogID = -1
-			, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-			, bool bPrintToLog = true, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 0x1111
-			, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
+	static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library")), int32 LogID = -1
+		, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
+		, bool bPrintToLog = true, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 0x1111
+		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
 
 	/*
 	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be valid for the Property in question.
@@ -68,35 +78,35 @@ public:
 
 	//Formats a Vector to the String Format expected for the SetPropertyValue
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "V3toSTR"))
-	static FString GetVectorString(const FVector& V);
+	static FString VectorToString(const FVector& V);
 	
 	//Formats a Rotator to the String Format expected for the SetPropertyValue
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "RtoSTR"))
-	static FString GetRotatorString(const FRotator& R);
+	static FString RotatorToString(const FRotator& R);
 
 	//Formats a Transform to the String Format expected for the SetPropertyValue
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "TtoSTR"))
-	static FString GetTransformString(const FTransform& T);
+	static FString TransformToString(const FTransform& T);
 
 	//Formats a Vector2D to the String Format expected for the SetPropertyValue
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "V2toSTR"))
-	static FString GetVector2DString(const FVector2D& V);
+	static FString Vector2DToString(const FVector2D& V);
 
 	//Parses the String from the GetPropertyValue to Vector
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoV3"))
-		static bool GetVector(const FString& S, FVector& V);
+	static bool StringToVector(const FString& S, FVector& V);
 
 	//Parses the String from the GetPropertyValue to Rotator
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoR"))
-		static bool GetRotator(const FString& S, FRotator& R);
+	static bool StringToRotator(const FString& S, FRotator& R);
 
 	//Parses the String from the GetPropertyValue to Transform
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoT"))
-		static bool GetTransform(const FString & S, FTransform & T);
+	static bool StringToTransform(const FString & S, FTransform & T);
 
 	//Parses the String from the GetPropertyValue to FVector2D
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoV2"))
-	static bool GetVector2D(const FString& S, FVector2D& V);
+	static bool StringToVector2D(const FString& S, FVector2D& V);
 
 
 //C++ Only

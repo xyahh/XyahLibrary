@@ -1,7 +1,7 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahUtilityLibrary.h"
-#include "XyahMathLibrary.h"
+#include "../Math/XyahMathLibrary.h"
 #include "Engine/Engine.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
@@ -13,6 +13,11 @@ bool UXyahUtilityLibrary::GetAllActorsOfClass(const UObject* WorldContextObject,
 	, FName FilterFunction /*= NAME_None*/, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+void UXyahUtilityLibrary::GetClassDefaultObject(TSubclassOf<UObject> ObjectClass, UObject*& OutObject)
+{
+	OutObject = GetMutableDefault<UObject>(ObjectClass);
 }
 
 //Blueprint & C++
@@ -51,6 +56,7 @@ void UXyahUtilityLibrary::PrintMessage(const FString& Message /*= FString(TEXT("
 
 bool UXyahUtilityLibrary::SetPropertyValue(UObject* OwnerObject, const FString& PropertyName, const FString& PropertyValue)
 {
+
 	if (IsValid(OwnerObject) && !PropertyName.IsEmpty())
 	{
 		FProperty* Property = FindFProperty<FProperty>(OwnerObject->GetClass(), *PropertyName);
@@ -87,17 +93,17 @@ bool UXyahUtilityLibrary::GetPropertyValue(UObject* OwnerObject, const FString& 
 	return false;
 }
 
-FString UXyahUtilityLibrary::GetVectorString(const FVector& V)
+FString UXyahUtilityLibrary::VectorToString(const FVector& V)
 {
 	return FString::Printf(TEXT("(X=%f,Y=%f,Z=%f)"), V.X, V.Y, V.Z);
 }
 
-FString UXyahUtilityLibrary::GetRotatorString(const FRotator& R)
+FString UXyahUtilityLibrary::RotatorToString(const FRotator& R)
 {
 	return FString::Printf(TEXT("(Pitch=%f,Yaw=%f,Roll=%f)"), R.Pitch, R.Yaw, R.Roll);
 }
 
-FString UXyahUtilityLibrary::GetTransformString(const FTransform& T)
+FString UXyahUtilityLibrary::TransformToString(const FTransform& T)
 {
 	FQuat Rot = T.GetRotation();
 	FVector Loc = T.GetLocation();
@@ -106,18 +112,18 @@ FString UXyahUtilityLibrary::GetTransformString(const FTransform& T)
 		, Rot.X, Rot.Y, Rot.Z, Rot.W, Loc.X, Loc.Y, Loc.Z, Scale.X, Scale.Y, Scale.Z);
 }
 
-FString UXyahUtilityLibrary::GetVector2DString(const FVector2D& V)
+FString UXyahUtilityLibrary::Vector2DToString(const FVector2D& V)
 {
 	return FString::Printf(TEXT("(X=%f,Y=%f)"), V.X, V.Y);
 }
 
-bool UXyahUtilityLibrary::GetVector(const FString& S, FVector& V)
+bool UXyahUtilityLibrary::StringToVector(const FString& S, FVector& V)
 {
 	V.X = V.Y = V.Z = 0.f;
 	return FParse::Value(*S, TEXT("X="), V.X) && FParse::Value(*S, TEXT("Y="), V.Y) && FParse::Value(*S, TEXT("Z="), V.Z);
 }
 
-bool UXyahUtilityLibrary::GetRotator(const FString& S, FRotator& R)
+bool UXyahUtilityLibrary::StringToRotator(const FString& S, FRotator& R)
 {
 	R.Pitch = R.Yaw = R.Roll = 0.f;
 	const bool bSuccessful = FParse::Value(*S, TEXT("Pitch="), R.Pitch) && FParse::Value(*S, TEXT("Yaw="), R.Yaw) && FParse::Value(*S, TEXT("Roll="), R.Roll);
@@ -125,7 +131,7 @@ bool UXyahUtilityLibrary::GetRotator(const FString& S, FRotator& R)
 	return bSuccessful;
 }
 
-bool UXyahUtilityLibrary::GetTransform(const FString& S, FTransform& T)
+bool UXyahUtilityLibrary::StringToTransform(const FString& S, FTransform& T)
 {
 	/* ToDo: Better way to Parse a String to the Transform Format given by Get/SetProperty? */
 
@@ -174,7 +180,7 @@ bool UXyahUtilityLibrary::GetTransform(const FString& S, FTransform& T)
 	return true;
 }
 
-bool UXyahUtilityLibrary::GetVector2D(const FString& S, FVector2D& V)
+bool UXyahUtilityLibrary::StringToVector2D(const FString& S, FVector2D& V)
 {
 	V.X = V.Y  = 0.f;
 	return FParse::Value(*S, TEXT("X="), V.X) && FParse::Value(*S, TEXT("Y="), V.Y);

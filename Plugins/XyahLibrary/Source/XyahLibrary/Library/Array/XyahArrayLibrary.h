@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "../XyahLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "UObject/UnrealType.h"

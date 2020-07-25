@@ -1,7 +1,7 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahArrayLibrary.h"
-#include "XyahUtilityLibrary.h"
+#include "../Utility/XyahUtilityLibrary.h"
 
 
 void UXyahArrayLibrary::GetRandom(const TArray<int32>& Array, int32& OutRandomElement)
