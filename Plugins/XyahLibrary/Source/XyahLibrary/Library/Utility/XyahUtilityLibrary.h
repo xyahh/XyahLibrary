@@ -7,6 +7,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahUtilityLibrary.generated.h"
 
+class UXyahBaseSettings;
+
 /**
  * 
  */
@@ -42,10 +44,12 @@ public:
 	@param ObjectClass - The class to get the Default Object from
 	@param OutObject - Reference to the Default Object
 	*/
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "ObjectClass", DynamicOutputParam = "OutObject"))
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "ObjectClass", DynamicOutputParam = "OutObject"))
 	static void GetClassDefaultObject(TSubclassOf<UObject> ObjectClass, UObject*& OutObject);
 
-
+	//Same as GetClassDefaultObject, but for Settings Only
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "SettingsClass", DynamicOutputParam = "OutSettings"))
+	static void GetSettings(TSubclassOf<UXyahBaseSettings> SettingsClass, UXyahBaseSettings*& OutSettings);
 
 	/* 
 	Prints a String to either the Screen, Log, or both. 

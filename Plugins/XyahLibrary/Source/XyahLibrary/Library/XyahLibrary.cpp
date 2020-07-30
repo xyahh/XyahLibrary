@@ -34,6 +34,9 @@ void FXyahLibraryModule::RegisterSettings()
 			, FText::FromString("Xyah Core Settings"),
 			GetMutableDefault <UXyahSettings>());
 
+		//Add Core as a Reserved Name
+		ReservedSettingsNames.Add("Core");
+
 		if (XyahSettings.IsValid())
 		{
 			//Register the auto-save processing at the time of update
@@ -42,16 +45,26 @@ void FXyahLibraryModule::RegisterSettings()
 
 		if (const UXyahSettings* XyahSettingsObj = GetDefault<UXyahSettings>())
 		{
-			if (XyahSettingsObj->CustomSettingsClass)
-			{
-				ISettingsSectionPtr CustomSettings = SettingsModule->RegisterSettings("Project", "Xyah", "Custom"
-					, FText::FromString("Custom")
-					, FText::FromString("Xyah Custom Settings"),
-					GetMutableDefault<UXyahBaseSettings>(XyahSettingsObj->CustomSettingsClass));
+			if (XyahSettingsObj->Settings.Num() > 0)
+				RegisteredSettingsNames.Reserve(XyahSettingsObj->Settings.Num());
 
-				if (CustomSettings.IsValid())
+			for (auto& SettingsClass : XyahSettingsObj->Settings)
+			{
+				//Make sure Class is valid AND that the Setting we are assigning is NOT a Reserved (in-use) Setting Name.
+				if (SettingsClass.Class && false == ReservedSettingsNames.Contains(SettingsClass.SettingsName))
 				{
-					CustomSettings->OnModified().BindUObject(GetMutableDefault<UXyahBaseSettings>(XyahSettingsObj->CustomSettingsClass), &UXyahBaseSettings::OnSettingsModified);
+					UXyahBaseSettings* SettingsObj = GetMutableDefault<UXyahBaseSettings>(SettingsClass.Class);
+
+					RegisteredSettingsNames.Add(SettingsClass.SettingsName);
+					ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Xyah", *SettingsClass.SettingsName
+						, FText::FromString(SettingsClass.SettingsName)
+						, FText::FromString(SettingsClass.Description),
+						SettingsObj);
+
+					if (SettingsSection.IsValid())
+					{
+						SettingsSection->OnModified().BindUObject(SettingsObj, &UXyahBaseSettings::OnSettingsModified);
+					}
 				}
 			}
 		}
@@ -71,7 +84,9 @@ void FXyahLibraryModule::UnregisterSettings()
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr <ISettingsModule>("Settings"))
 	{
 		SettingsModule->UnregisterSettings("Project", "Xyah", "Core");
-		SettingsModule->UnregisterSettings("Project", "Xyah", "Custom");
+		for (auto& SettingsName : RegisteredSettingsNames)
+			SettingsModule->UnregisterSettings("Project", "Xyah", *SettingsName);
+		RegisteredSettingsNames.Empty();
 	}
 #endif
 }

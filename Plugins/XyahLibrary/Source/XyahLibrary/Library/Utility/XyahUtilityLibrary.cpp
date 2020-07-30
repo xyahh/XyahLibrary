@@ -2,6 +2,7 @@
 
 #include "XyahUtilityLibrary.h"
 #include "../Math/XyahMathLibrary.h"
+
 #include "Engine/Engine.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
@@ -18,6 +19,12 @@ bool UXyahUtilityLibrary::GetAllActorsOfClass(const UObject* WorldContextObject,
 void UXyahUtilityLibrary::GetClassDefaultObject(TSubclassOf<UObject> ObjectClass, UObject*& OutObject)
 {
 	OutObject = GetMutableDefault<UObject>(ObjectClass);
+}
+
+#include "XyahLibrary/Settings/XyahSettings.h"
+void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahBaseSettings> SettingsClass, UXyahBaseSettings*& OutSettings)
+{
+	OutSettings = GetMutableDefault<UXyahBaseSettings>(SettingsClass);
 }
 
 //Blueprint & C++

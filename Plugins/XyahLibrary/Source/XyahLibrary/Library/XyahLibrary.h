@@ -18,6 +18,9 @@ public:
 
 protected:
 
+	TArray<FString> RegisteredSettingsNames;
+	TSet<FString> ReservedSettingsNames;
+
 	void RegisterSettings();
 	bool OnSettingsModified();
 	void UnregisterSettings();

@@ -13,11 +13,29 @@ class XYAHLIBRARY_API UXyahBaseSettings : public UObject
 
 public:
 
+	UXyahBaseSettings();
+
 	// Called when a Property for the Specified Class Default Object in Project/Xyah/Core CustomSettingsClass has been Modified in Settings
 	UFUNCTION(BlueprintNativeEvent, Category = "Xyah")
 	bool OnSettingsModified();
 
 };
+
+USTRUCT(BlueprintType)
+struct XYAHLIBRARY_API FXyahSettingsInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
+	FString SettingsName;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
+	TSubclassOf<UXyahBaseSettings> Class;
+
+	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
+	FString Description;
+};
+
 
 /**
  * 
@@ -29,9 +47,10 @@ class XYAHLIBRARY_API UXyahSettings : public UObject
 	
 
 public:
-
+	
+	//The Settings Classes to use. Must restart Editor to see the changes.
 	UPROPERTY(Config, EditAnywhere, Category = "Xyah")
-    TSubclassOf<UXyahBaseSettings> CustomSettingsClass;
+    TArray<FXyahSettingsInfo> Settings;
 
 };
 

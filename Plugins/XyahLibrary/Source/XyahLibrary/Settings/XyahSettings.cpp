@@ -2,6 +2,9 @@
 
 
 #include "XyahSettings.h"
+UXyahBaseSettings::UXyahBaseSettings()
+{	
+}
 
 bool UXyahBaseSettings::OnSettingsModified_Implementation()
 {
