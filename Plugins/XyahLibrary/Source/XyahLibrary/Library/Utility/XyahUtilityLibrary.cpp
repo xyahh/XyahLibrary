@@ -16,6 +16,16 @@ bool UXyahUtilityLibrary::GetAllActorsOfClass(const UObject* WorldContextObject,
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
+bool UXyahUtilityLibrary::ToString(int32 InValue, FString& OutString)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+bool UXyahUtilityLibrary::FromString(const FString& InString, int32& RefValue)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
 void UXyahUtilityLibrary::GetClassDefaultObject(TSubclassOf<UObject> ObjectClass, UObject*& OutObject)
 {
 	OutObject = GetMutableDefault<UObject>(ObjectClass);
@@ -93,104 +103,23 @@ bool UXyahUtilityLibrary::GetPropertyValue(UObject* OwnerObject, const FString& 
 		FProperty* Property = FindFProperty<FProperty>(OwnerObject->GetClass(), *PropertyName);
 		if (Property)
 		{
-			Property->ExportText_InContainer(0, OutPropertyValue, OwnerObject, OwnerObject, OwnerObject, PPF_SimpleObjectText);
-			return true;
+			FString PropertyVal;
+			bool bProcessedFirst = false;
+			for (int32 i = 0; i < Property->ArrayDim; ++i)
+			{
+				if (Property->ExportText_InContainer(i, PropertyVal, OwnerObject, OwnerObject, OwnerObject, PPF_SimpleObjectText))
+				{
+					if (bProcessedFirst)
+						OutPropertyValue.Append(",");
+					OutPropertyValue += PropertyVal;
+					bProcessedFirst = true;
+					
+				}
+			}
+			return !OutPropertyValue.IsEmpty();
 		}
 	}
 	return false;
-}
-
-FString UXyahUtilityLibrary::VectorToString(const FVector& V)
-{
-	return FString::Printf(TEXT("(X=%f,Y=%f,Z=%f)"), V.X, V.Y, V.Z);
-}
-
-FString UXyahUtilityLibrary::RotatorToString(const FRotator& R)
-{
-	return FString::Printf(TEXT("(Pitch=%f,Yaw=%f,Roll=%f)"), R.Pitch, R.Yaw, R.Roll);
-}
-
-FString UXyahUtilityLibrary::TransformToString(const FTransform& T)
-{
-	FQuat Rot = T.GetRotation();
-	FVector Loc = T.GetLocation();
-	FVector Scale = T.GetScale3D();
-	return FString::Printf(TEXT("(Rotation=(X=%f,Y=%f,Z=%f,W=%f),Translation=(X=%f,Y=%f,Z=%f),Scale3D=(X=%f,Y=%f,Z=%f))")
-		, Rot.X, Rot.Y, Rot.Z, Rot.W, Loc.X, Loc.Y, Loc.Z, Scale.X, Scale.Y, Scale.Z);
-}
-
-FString UXyahUtilityLibrary::Vector2DToString(const FVector2D& V)
-{
-	return FString::Printf(TEXT("(X=%f,Y=%f)"), V.X, V.Y);
-}
-
-bool UXyahUtilityLibrary::StringToVector(const FString& S, FVector& V)
-{
-	V.X = V.Y = V.Z = 0.f;
-	return FParse::Value(*S, TEXT("X="), V.X) && FParse::Value(*S, TEXT("Y="), V.Y) && FParse::Value(*S, TEXT("Z="), V.Z);
-}
-
-bool UXyahUtilityLibrary::StringToRotator(const FString& S, FRotator& R)
-{
-	R.Pitch = R.Yaw = R.Roll = 0.f;
-	const bool bSuccessful = FParse::Value(*S, TEXT("Pitch="), R.Pitch) && FParse::Value(*S, TEXT("Yaw="), R.Yaw) && FParse::Value(*S, TEXT("Roll="), R.Roll);
-	R.DiagnosticCheckNaN();
-	return bSuccessful;
-}
-
-bool UXyahUtilityLibrary::StringToTransform(const FString& S, FTransform& T)
-{
-	/* ToDo: Better way to Parse a String to the Transform Format given by Get/SetProperty? */
-
-	FQuat Rotation;
-	FVector Location;
-	FVector Scale;
-
-	//Rotation
-	{
-		int32 StartingIndex = S.Find("Rotation=");
-		if (StartingIndex < 0)
-			return false;
-
-		FString RotationString = S.RightChop(StartingIndex);
-		if (false == (FParse::Value(*RotationString, TEXT("X="), Rotation.X) && FParse::Value(*RotationString, TEXT("Y="), Rotation.Y)
-			&& FParse::Value(*RotationString, TEXT("Z="), Rotation.Z) && FParse::Value(*RotationString, TEXT("W="), Rotation.W)))
-			return false;
-	}
-
-	//Translation
-	{
-		int32 StartingIndex = S.Find("Translation=");
-		if (StartingIndex < 0)
-			return false;
-
-		FString LocationString = S.RightChop(StartingIndex);
-		if (false == (FParse::Value(*LocationString, TEXT("X="), Location.X) && FParse::Value(*LocationString, TEXT("Y="), Location.Y)
-			&& FParse::Value(*LocationString, TEXT("Z="), Location.Z)))
-			return false;
-	}
-	
-	//Scale
-	{
-
-		int32 StartingIndex = S.Find("Scale3D=");
-		if (StartingIndex < 0)
-			return false;
-
-		FString ScaleString = S.RightChop(StartingIndex);
-		if (false == (FParse::Value(*ScaleString, TEXT("X="), Scale.X) && FParse::Value(*ScaleString, TEXT("Y="), Scale.Y)
-			&& FParse::Value(*ScaleString, TEXT("Z="), Scale.Z)))
-			return false;
-	}
-
-	T = FTransform(Rotation, Location, Scale);
-	return true;
-}
-
-bool UXyahUtilityLibrary::StringToVector2D(const FString& S, FVector2D& V)
-{
-	V.X = V.Y  = 0.f;
-	return FParse::Value(*S, TEXT("X="), V.X) && FParse::Value(*S, TEXT("Y="), V.Y);
 }
 
 bool UXyahUtilityLibrary::CheckProperties(const FProperty* A, const FProperty* B, bool bCheckPropertyOffsets, bool bCheckPropertyNames)
@@ -379,4 +308,22 @@ void UXyahUtilityLibrary::Generic_GetAllActorsOfClass(const UObject* WorldContex
 			}
 		}
 	}
+}
+
+bool UXyahUtilityLibrary::Generic_ToString(FProperty* Property, void* Data, FString& OutString)
+{
+	if (Property && Data)
+	{
+		return Property->ExportText_Direct(OutString, Data, Data, 0, PPF_SimpleObjectText);
+	}
+	return false;
+}
+
+bool UXyahUtilityLibrary::Generic_FromString(const FString& InString, FProperty* Property, void* Data)
+{
+	if (Property && Data)
+	{
+		return !!Property->ImportText(*InString, Data, 0, 0);
+	}
+	return false;
 }

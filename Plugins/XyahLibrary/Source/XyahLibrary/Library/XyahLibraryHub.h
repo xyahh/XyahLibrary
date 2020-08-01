@@ -17,11 +17,11 @@ DECLARE_LOG_CATEGORY_EXTERN(XyahLog, Log, All);
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EXyahConsoleColor
 {
-	XCC_Dark = 0	UMETA(Hidden),
-	XCC_Red = 1		UMETA(DisplayName = "Red"),
-	XCC_Green = 2	UMETA(DisplayName = "Green"),
-	XCC_Blue = 4	UMETA(DisplayName = "Blue"),
-	XCC_Light = 8	UMETA(DisplayName = "Light"),
+	XCC_Dark	= 0	UMETA(Hidden),
+	XCC_Red		= 1	UMETA(DisplayName = "Red"),
+	XCC_Green	= 2	UMETA(DisplayName = "Green"),
+	XCC_Blue	= 4	UMETA(DisplayName = "Blue"),
+	XCC_Light	= 8	UMETA(DisplayName = "Light"),
 };
 
 /* XYAH HELPER MACROS */

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "../XyahLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Net/Core/PushModel/PushModel.h"
 #include "XyahUtilityLibrary.generated.h"
 
 class UXyahBaseSettings;
@@ -36,6 +37,26 @@ protected:
 	static bool GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
 		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName = NAME_None, UObject* FunctionOwner = nullptr);
 
+	/*
+	Returns the Input as a String in the Simple Object Text Format.
+
+	@param InValue - The Input
+	@param OutString - The Input Value in String (Simple Object Text) Format.
+	@return [bool] Whether the operation was successful
+	*/
+	UFUNCTION(BlueprintPure, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "InValue"))
+	static bool ToString(int32 InValue, FString& OutString);
+
+	/*
+	Sets the Referenced Variable the Value given in the String.
+
+	@param InString - The String Containing the Value
+	@param RefValue - The Variable to Modify based on the String's value
+	@return [bool] Whether the operation was successful
+	*/
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "RefValue"))
+	static bool FromString(const FString& InString, UPARAM(Ref) int32& RefValue);
+
 //Blueprints & C++ 
 public:
 
@@ -66,52 +87,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly))
 	static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library")), int32 LogID = -1
 		, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-		, bool bPrintToLog = true, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 0x1111
+		, bool bPrintToLog = true, int32 ConsoleTextColor = 15
 		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
 
 	/*
-	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be valid for the Property in question.
-	@see XyahUtility's Implementations of String Conversion types for a safe conversion of core structs like Vector, Rotator, etc.
+	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be in Simple Object Text Format
+	@see ToString
+	@see FromString
 	*/
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool SetPropertyValue(UObject* OwnerObject, const FString& PropertyName, const FString& PropertyValue);
 
-	//Gets a Given Property's Value belonging to the Given Object as String 	
+	//Gets a Given Property's Value belonging to the Given Object as String in the Simple Object Text Format	
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue);
-
-	//Formats a Vector to the String Format expected for the SetPropertyValue
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "V3toSTR"))
-	static FString VectorToString(const FVector& V);
-	
-	//Formats a Rotator to the String Format expected for the SetPropertyValue
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "RtoSTR"))
-	static FString RotatorToString(const FRotator& R);
-
-	//Formats a Transform to the String Format expected for the SetPropertyValue
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "TtoSTR"))
-	static FString TransformToString(const FTransform& T);
-
-	//Formats a Vector2D to the String Format expected for the SetPropertyValue
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "V2toSTR"))
-	static FString Vector2DToString(const FVector2D& V);
-
-	//Parses the String from the GetPropertyValue to Vector
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoV3"))
-	static bool StringToVector(const FString& S, FVector& V);
-
-	//Parses the String from the GetPropertyValue to Rotator
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoR"))
-	static bool StringToRotator(const FString& S, FRotator& R);
-
-	//Parses the String from the GetPropertyValue to Transform
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoT"))
-	static bool StringToTransform(const FString & S, FTransform & T);
-
-	//Parses the String from the GetPropertyValue to FVector2D
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (CompactNodeTitle = "STRtoV2"))
-	static bool StringToVector2D(const FString& S, FVector2D& V);
-
 
 //C++ Only
 public:
@@ -123,7 +112,7 @@ public:
 	template<class... Args>
 	static void Print(const FString& Format, Args&&... Arguments, int32 LogID = -1
 		, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-		, bool bPrintToLog = true, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 0x1111
+		, bool bPrintToLog = true, int32 ConsoleTextColor = 15
 		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
 	
 	//Finds a Function from a Given Object
@@ -137,6 +126,9 @@ public:
 	static void Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, FProperty* ArrayInnerProperty
 		, TArray<AActor*>& OutActors
 		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName, UObject* FuncOwner);
+
+	static bool Generic_ToString(FProperty* Property, void* Data, FString& OutString);
+	static bool Generic_FromString(const FString& InString, FProperty* Property, void* Data);
 
 public:
 
@@ -159,6 +151,34 @@ public:
 		P_NATIVE_END;
 	}
 
+	DECLARE_FUNCTION(execToString)
+	{
+		Stack.Step(Stack.Object, NULL);
+		FProperty* InProperty = Stack.MostRecentProperty;
+		void* Data = Stack.MostRecentPropertyAddress;
+
+		PARAM_PASSED_BY_REF(OutString, FStrProperty, FString);
+
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		XYAH_RETURN(bool, Generic_ToString(InProperty, Data, OutString));
+		P_NATIVE_END;
+	}
+
+	DECLARE_FUNCTION(execFromString)
+	{
+		P_GET_PROPERTY(FStrProperty, InString);
+
+		Stack.Step(Stack.Object, NULL);
+		FProperty* RefProperty = Stack.MostRecentProperty;
+		void* Data = Stack.MostRecentPropertyAddress;
+		P_FINISH;
+
+		P_NATIVE_BEGIN;
+		XYAH_MARK_PROPERTY_DIRTY(RefProperty);
+		XYAH_RETURN(bool, Generic_FromString(InString, RefProperty, Data));
+		P_NATIVE_END;
+	}
 };
 
 #if XYAH_UTILITY_LIBRARY
