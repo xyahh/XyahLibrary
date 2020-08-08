@@ -70,7 +70,7 @@ public:
 
 	//Same as GetClassDefaultObject, but for Settings Only
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "SettingsClass", DynamicOutputParam = "OutSettings"))
-	static void GetSettings(TSubclassOf<UXyahBaseSettings> SettingsClass, UXyahBaseSettings*& OutSettings);
+	static void GetSettings(TSubclassOf<UXyahSettings> SettingsClass, UXyahSettings*& OutSettings);
 
 	/* 
 	Prints a String to either the Screen, Log, or both. 

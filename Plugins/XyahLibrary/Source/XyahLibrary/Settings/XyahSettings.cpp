@@ -2,11 +2,16 @@
 
 
 #include "XyahSettings.h"
-UXyahBaseSettings::UXyahBaseSettings()
+UXyahSettings::UXyahSettings()
 {	
 }
 
-bool UXyahBaseSettings::OnSettingsModified_Implementation()
+bool UXyahSettings::OnSettingsModified_Implementation()
 {
 	return true;
+}
+
+void UXyahSettings::SaveSettings()
+{
+	SaveConfig(CPF_Config);
 }

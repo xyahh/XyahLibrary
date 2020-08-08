@@ -6,20 +6,28 @@
 #include "UObject/NoExportTypes.h"
 #include "XyahSettings.generated.h"
 
-UCLASS(config = XyahSettings, DefaultConfig, Blueprintable)
-class XYAHLIBRARY_API UXyahBaseSettings : public UObject
+UCLASS(config = XyahSettings, Blueprintable)
+class XYAHLIBRARY_API UXyahSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
 
-	UXyahBaseSettings();
+	UXyahSettings();
 
 	// Called when a Property for the Specified Class Default Object in Project/Xyah/Core CustomSettingsClass has been Modified in Settings
 	UFUNCTION(BlueprintNativeEvent, Category = "Xyah")
 	bool OnSettingsModified();
 
+	void SaveSettings();
 };
+
+UCLASS(DefaultConfig)
+class XYAHLIBRARY_API UXyahDefaultSettings : public UXyahSettings
+{
+	GENERATED_BODY()
+};
+
 
 USTRUCT(BlueprintType)
 struct XYAHLIBRARY_API FXyahSettingsInfo
@@ -30,10 +38,14 @@ struct XYAHLIBRARY_API FXyahSettingsInfo
 	FString SettingsName;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
-	TSubclassOf<UXyahBaseSettings> Class;
+	TSubclassOf<UXyahSettings> Class;
 
 	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
 	FString Description;
+
+	//Whether to save all the Configuration regardless if it has not been changed from its Original Default values.
+	UPROPERTY(Config, EditAnywhere, Category = "Class Settings")
+	bool	bSaveAllConfig;
 };
 
 
@@ -41,7 +53,7 @@ struct XYAHLIBRARY_API FXyahSettingsInfo
  * 
  */
 UCLASS(config = XyahSettings, DefaultConfig)
-class XYAHLIBRARY_API UXyahSettings : public UObject
+class XYAHLIBRARY_API UXyahCoreSettings : public UObject
 {
 	GENERATED_BODY()
 	

@@ -32,9 +32,9 @@ void UXyahUtilityLibrary::GetClassDefaultObject(TSubclassOf<UObject> ObjectClass
 }
 
 #include "XyahLibrary/Settings/XyahSettings.h"
-void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahBaseSettings> SettingsClass, UXyahBaseSettings*& OutSettings)
+void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, UXyahSettings*& OutSettings)
 {
-	OutSettings = GetMutableDefault<UXyahBaseSettings>(SettingsClass);
+	OutSettings = GetMutableDefault<UXyahSettings>(SettingsClass);
 }
 
 //Blueprint & C++

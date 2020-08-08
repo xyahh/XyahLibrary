@@ -32,7 +32,7 @@ void FXyahLibraryModule::RegisterSettings()
 		ISettingsSectionPtr XyahSettings = SettingsModule->RegisterSettings("Project", "Xyah", "Core"
 			, FText::FromString("Core")
 			, FText::FromString("Xyah Core Settings"),
-			GetMutableDefault <UXyahSettings>());
+			GetMutableDefault <UXyahCoreSettings>());
 
 		//Add Core as a Reserved Name
 		ReservedSettingsNames.Add("Core");
@@ -43,27 +43,30 @@ void FXyahLibraryModule::RegisterSettings()
 			XyahSettings->OnModified().BindRaw(this, &FXyahLibraryModule::OnSettingsModified);
 		}
 
-		if (const UXyahSettings* XyahSettingsObj = GetDefault<UXyahSettings>())
+		if (const UXyahCoreSettings* XyahCore = GetDefault<UXyahCoreSettings>())
 		{
-			if (XyahSettingsObj->Settings.Num() > 0)
-				RegisteredSettingsNames.Reserve(XyahSettingsObj->Settings.Num());
+			if (XyahCore->Settings.Num() > 0)
+				RegisteredSettingsNames.Reserve(XyahCore->Settings.Num());
 
-			for (auto& SettingsClass : XyahSettingsObj->Settings)
+			for (auto& SettingsClass : XyahCore->Settings)
 			{
 				//Make sure Class is valid AND that the Setting we are assigning is NOT a Reserved (in-use) Setting Name.
 				if (SettingsClass.Class && false == ReservedSettingsNames.Contains(SettingsClass.SettingsName))
 				{
-					UXyahBaseSettings* SettingsObj = GetMutableDefault<UXyahBaseSettings>(SettingsClass.Class);
+					UXyahSettings* SettingsObject = GetMutableDefault<UXyahSettings>(SettingsClass.Class);
+					
+					if(SettingsClass.bSaveAllConfig)
+						SettingsObject->SaveSettings();
 
 					RegisteredSettingsNames.Add(SettingsClass.SettingsName);
 					ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Xyah", *SettingsClass.SettingsName
 						, FText::FromString(SettingsClass.SettingsName)
 						, FText::FromString(SettingsClass.Description),
-						SettingsObj);
+						SettingsObject);
 
 					if (SettingsSection.IsValid())
 					{
-						SettingsSection->OnModified().BindUObject(SettingsObj, &UXyahBaseSettings::OnSettingsModified);
+						SettingsSection->OnModified().BindUObject(SettingsObject, &UXyahSettings::OnSettingsModified);
 					}
 				}
 			}
