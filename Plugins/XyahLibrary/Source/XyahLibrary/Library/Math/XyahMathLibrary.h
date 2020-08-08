@@ -95,12 +95,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Float", meta = (DisplayName = "Get Range Float"))
 	static void GetRange_Float(const TArray<float>& InArray, bool bIsSorted, float& Min, float& Max);
 
-
-/* VECTOR */
-
-	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Vector", meta = (CompactNodeTitle = "SPLIT"))
-	static void SplitVectorArray(const TArray<FVector>& InArray, TArray<float>& X, TArray<float>& Y, TArray<float>& Z);
-
+	//Gets the Range of all the Elements in the Array
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Get Range Vector"))
+	static void GetRange_Vector(const TArray<FVector>& InArray, FVector& Min, FVector& Max);
 };
 
 

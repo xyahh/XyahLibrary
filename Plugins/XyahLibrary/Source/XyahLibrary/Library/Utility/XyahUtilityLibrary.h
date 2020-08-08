@@ -84,11 +84,26 @@ public:
 	@param bNewerOnTop - Whether to put this Log at the Top, or stack them below
 	@param TextScale - the Scale of the Text (default 1.f)
 	*/
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly))
-	static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library")), int32 LogID = -1
-		, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-		, bool bPrintToLog = true, int32 ConsoleTextColor = 15
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay = "1", DevelopmentOnly))
+	static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library"))
+		, int32 LogID = -1, bool bPrintToScreen = true
+		, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
+		, bool bPrintToLog = true
+		, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 15
 		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
+
+
+	/*
+	Gets all the Properties and their values of a Given UObject.
+	@param OwnerObject - the Object whose properties to get
+	@param ExcludeParents - The parents of the Object whose properties to ignore
+	@param PropertyFlags - At least 1 flag must be satisfied by a property for it to be considered. If no flags are selected, no check will take place and all properties will be considered. 
+	@param OutProperties - Result Map of the Property Names (Keys) and Property Values (Values)
+	*/
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (AutoCreateRefTerm = "ExcludeParents", AdvancedDisplay = "bIncludeReplicated,bIncludeNonReplicated"))
+	static void GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
+	, TMap<FString, FString>& OutProperties
+	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 PropertyFlags = 0);
 
 	/*
 	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be in Simple Object Text Format
@@ -101,6 +116,10 @@ public:
 	//Gets a Given Property's Value belonging to the Given Object as String in the Simple Object Text Format	
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue);
+
+protected:
+
+	static bool GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue);
 
 //C++ Only
 public:

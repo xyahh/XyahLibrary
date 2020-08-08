@@ -71,6 +71,28 @@ void UXyahUtilityLibrary::PrintMessage(const FString& Message /*= FString(TEXT("
 
 }
 
+void UXyahUtilityLibrary::GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
+, TMap<FString, FString>& OutProperties, int32 PropertyFlags /*= 0*/)
+{
+	OutProperties.Empty();
+	if (OwnerObject)
+	{
+		for (TFieldIterator<FProperty> PropertyIter(OwnerObject->GetClass()); PropertyIter; ++PropertyIter)
+		{
+			if (ExcludeParents.Contains(PropertyIter->GetOwnerClass()))
+				continue;
+
+			if(PropertyFlags == EXyahPropertyFlags::XPF_All 
+			|| (static_cast<uint64>(PropertyIter->GetPropertyFlags()) & ConvertXyahPropertyFlags(PropertyFlags)))
+			{
+				FString PropertyValue;
+				GetPropertyValue_Internal(OwnerObject, *PropertyIter, PropertyValue);
+				OutProperties.Add(PropertyIter->GetName(), PropertyValue);
+			}
+		}
+	}
+}
+
 bool UXyahUtilityLibrary::SetPropertyValue(UObject* OwnerObject, const FString& PropertyName, const FString& PropertyValue)
 {
 
@@ -97,27 +119,34 @@ bool UXyahUtilityLibrary::SetPropertyValue(UObject* OwnerObject, const FString& 
 
 bool UXyahUtilityLibrary::GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue)
 {
-	OutPropertyValue.Empty();
 	if (IsValid(OwnerObject) && !PropertyName.IsEmpty())
 	{
-		FProperty* Property = FindFProperty<FProperty>(OwnerObject->GetClass(), *PropertyName);
-		if (Property)
+		return GetPropertyValue_Internal(OwnerObject
+		, FindFProperty<FProperty>(OwnerObject->GetClass(), *PropertyName)
+		, OutPropertyValue);
+	}
+	return false;
+}
+
+bool UXyahUtilityLibrary::GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue)
+{
+	OutPropertyValue.Empty();
+	if (Property)
+	{
+		FString PropertyVal;
+		bool bProcessedFirst = false;
+		for (int32 i = 0; i < Property->ArrayDim; ++i)
 		{
-			FString PropertyVal;
-			bool bProcessedFirst = false;
-			for (int32 i = 0; i < Property->ArrayDim; ++i)
+			if (Property->ExportText_InContainer(i, PropertyVal, OwnerObject, OwnerObject, OwnerObject, PPF_SimpleObjectText))
 			{
-				if (Property->ExportText_InContainer(i, PropertyVal, OwnerObject, OwnerObject, OwnerObject, PPF_SimpleObjectText))
-				{
-					if (bProcessedFirst)
-						OutPropertyValue.Append(",");
-					OutPropertyValue += PropertyVal;
-					bProcessedFirst = true;
-					
-				}
+				if (bProcessedFirst)
+					OutPropertyValue.Append(",");
+				OutPropertyValue += PropertyVal;
+				bProcessedFirst = true;
+
 			}
-			return !OutPropertyValue.IsEmpty();
 		}
+		return !OutPropertyValue.IsEmpty();
 	}
 	return false;
 }

@@ -80,22 +80,20 @@ void UXyahMathLibrary::GetRange_Float(const TArray<float>& InArray, bool bIsSort
 	GetRange(InArray, bIsSorted, Min, Max);
 }
 
-void UXyahMathLibrary::SplitVectorArray(const TArray<FVector>& InArray, TArray<float>& X, TArray<float>& Y, TArray<float>& Z)
+void UXyahMathLibrary::GetRange_Vector(const TArray<FVector>& InArray, FVector& Min, FVector& Max)
 {
-	const int32 Count = InArray.Num();
-
-	if (Count > 0)
+	if (InArray.Num() > 0)
 	{
-		X.Init(0.f, Count);
-		Y.Init(0.f, Count);
-		Z.Init(0.f, Count);
-		for (int32 i = 0; i < Count; ++i)
+		Min = Max = InArray[0];
+		for (auto& i : InArray)
 		{
-			X[i] = InArray[i].X;
-			Y[i] = InArray[i].Y;
-			Z[i] = InArray[i].Z;
+			Max.X = FMath::Max(i.X, Max.X);
+			Max.Y = FMath::Max(i.Y, Max.Y);
+			Max.Z = FMath::Max(i.Z, Max.Z);
+
+			Min.X = FMath::Min(i.X, Min.X);
+			Min.Y = FMath::Min(i.Y, Min.Y);
+			Min.Z = FMath::Min(i.Z, Min.Z);
 		}
 	}
-	
 }
-

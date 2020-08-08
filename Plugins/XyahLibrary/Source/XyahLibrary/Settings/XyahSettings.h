@@ -6,7 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "XyahSettings.generated.h"
 
-UCLASS(config = Game, DefaultConfig, Blueprintable)
+UCLASS(config = XyahSettings, DefaultConfig, Blueprintable)
 class XYAHLIBRARY_API UXyahBaseSettings : public UObject
 {
 	GENERATED_BODY()
@@ -40,7 +40,7 @@ struct XYAHLIBRARY_API FXyahSettingsInfo
 /**
  * 
  */
-UCLASS(config = Game, DefaultConfig)
+UCLASS(config = XyahSettings, DefaultConfig)
 class XYAHLIBRARY_API UXyahSettings : public UObject
 {
 	GENERATED_BODY()

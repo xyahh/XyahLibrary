@@ -16,7 +16,7 @@ AverageType UXyahMathLibrary::GetAverage(const TArray<ElementType>& InArray)
 {
 	if (InArray.Num() > 0)
 		// Dividing by float because it should be supported by all AverageTypes (e.g. FVector)
-		return	GetSum<ElementType, AverageType>(InArray) / static_cast<float>(InArray.Num());
+		return	static_cast<AverageType>(GetSum<ElementType, AverageType>(InArray) / static_cast<float>(InArray.Num()));
 	else
 		return AverageType{};
 }
