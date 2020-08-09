@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "XyahLibraryCore.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahActorLibrary.generated.h"
 
@@ -34,14 +34,6 @@ protected:
 	static bool BP_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
 		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName = NAME_None, UObject* FunctionOwner = nullptr);
 
-	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Actor", meta = (DisplayName = "Spawn Actor Deferred", WorldContext = "WorldContextObject", DeterminesOutputType = "ActorClass", DynamicOutputParam = "SpawnedActor", AutoCreateRefTerm = "ClassesToIgnore", AdvancedDisplay = "2"))
-	static bool BP_SpawnActorDeferred(const UObject* WorldContextObject
-		, TSubclassOf<AActor> ActorClass, AActor*& SpawnedActor, const FTransform& WorldTransform
-		, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::Undefined
-		, AActor* SpawnedActorOwner = nullptr
-		, FName PreBeginPlayFunction = NAME_None
-		, UObject* FunctionOwner = nullptr);
-
 //C++
 public:
 
@@ -65,7 +57,6 @@ public:
 public:
 
 	DECLARE_FUNCTION(execBP_GetAllActorsOfClass);
-	DECLARE_FUNCTION(execBP_SpawnActorDeferred);
 };
 
 

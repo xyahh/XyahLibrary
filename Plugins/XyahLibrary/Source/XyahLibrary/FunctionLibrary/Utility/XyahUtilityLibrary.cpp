@@ -28,33 +28,32 @@ void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, 
 }
 
 //Blueprint & C++
-void UXyahUtilityLibrary::PrintMessage(const FString& Message /*= FString(TEXT("Xyah Library"))*/, int32 LogID /*= -1 */, bool bPrintToScreen /*= true*/
-	, FLinearColor ScreenTextColor /*= FLinearColor(0.0, 0.66, 1.0) */, bool bPrintToLog /*= true*/, int32 ConsoleTextColor /*= 15 */
-	, float Duration /*= 2.f*/, bool bNewerOnTop /*= true*/, float TextScale /*= 1.f*/)
+void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrintSettings& Settings)
 {
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 
-	if (bPrintToLog)
+	if (Settings.bPrintToLog)
 	{
-		FString BinaryString(4, *XYAH(Math) ToBinaryString(ConsoleTextColor, true).Reverse());
+		FString BinaryString(4, *XYAH(Math) ToBinaryString(Settings.ConsoleTextColor, true).Reverse());
 		SET_WARN_COLOR(*BinaryString);
-		XYAH_LOG(Log, TEXT("%s"), *Message);
+		XYAH_LIB_LOG(Log, TEXT("%s"), *Message);
 		CLEAR_WARN_COLOR();
 	}
 	else
 	{
-		XYAH_LOG(Verbose, TEXT("%s"), *Message);
+		XYAH_LIB_LOG(Verbose, TEXT("%s"), *Message);
 	}
 
-	if (bPrintToScreen)
+	if (Settings.bPrintToScreen)
 	{
 		if (GAreScreenMessagesEnabled)
 		{
-			GEngine->AddOnScreenDebugMessage(LogID, Duration > 0.f ? Duration : 1.f, ScreenTextColor.ToFColor(true), Message, bNewerOnTop, FVector2D(TextScale));
+			GEngine->AddOnScreenDebugMessage(Settings.LogID, Settings.Duration > 0.f ? Settings.Duration : 1.f
+			, Settings.ScreenTextColor.ToFColor(true), Message, Settings.bNewerOnTop, FVector2D(Settings.TextScale));
 		}
 		else
 		{
-			XYAH_LOG(VeryVerbose, TEXT("Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."));
+			XYAH_LIB_LOG(VeryVerbose, TEXT("Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."));
 		}
 	}
 #endif
@@ -167,7 +166,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 {
 	if (false == IsValid(Object))
 	{
-		XYAH_LOG(Warning, TEXT("(%s)! Object is Invalid!")
+		XYAH_LIB_LOG(Warning, TEXT("(%s)! Object is Invalid!")
 			, *ErrorString);
 		return nullptr;
 	}
@@ -176,7 +175,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 
 	if (!Function)
 	{
-		XYAH_LOG(Warning, TEXT("(%s)! Could not find Function (%s) in Object (%s)")
+		XYAH_LIB_LOG(Warning, TEXT("(%s)! Could not find Function (%s) in Object (%s)")
 			, *ErrorString, *FunctionName.ToString(), *Object->GetName());
 		return nullptr;
 	}
@@ -185,7 +184,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 
 	if (Function->NumParms != TotalParams)
 	{
-		XYAH_LOG(Warning, TEXT("(%s)! Pred Function (%s) Parameter Count Incorrect. There should be %d input params and a bool return value!")
+		XYAH_LIB_LOG(Warning, TEXT("(%s)! Pred Function (%s) Parameter Count Incorrect. There should be %d input params and a bool return value!")
 			, *ErrorString
 			, *FunctionName.ToString()
 			, ExpectedInputParams);
@@ -205,7 +204,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 			{
 				if (InnerProperty)
 				{
-					XYAH_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) must be of type (%s).")
+					XYAH_LIB_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) must be of type (%s).")
 						, *ErrorString
 						, *FuncProperty->GetAuthoredName()
 						, *FunctionName.ToString()
@@ -213,7 +212,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 				}
 				else
 				{
-					XYAH_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) failed! Inner Property is NULL.")
+					XYAH_LIB_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) failed! Inner Property is NULL.")
 						, *ErrorString
 						, *FuncProperty->GetAuthoredName()
 						, *FunctionName.ToString());
@@ -224,7 +223,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 			}
 			if (FuncIterator->PropertyFlags & CPF_ReturnParm)
 			{
-				XYAH_LOG(Warning, TEXT("(%s)! There should be %d input Params in Function (%s)!")
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! There should be %d input Params in Function (%s)!")
 					, *ErrorString
 					, ExpectedInputParams
 					, *FunctionName.ToString());
@@ -236,7 +235,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 			//Always check for a Bool ret val since this Func is used to Check PREDICATE funcs. 
 			if (FuncProperty->GetClass() != FBoolProperty::StaticClass()) //I think I do not need to do a rigorous Check for BoolProperty.
 			{
-				XYAH_LOG(Warning, TEXT("(%s)! Last Parameter (Return Value) in Predicate Function (%s) must be of type bool.")
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! Last Parameter (Return Value) in Predicate Function (%s) must be of type bool.")
 					, *ErrorString
 					, *FunctionName.ToString());
 				return nullptr; //last property (ret val) is not Bool
@@ -250,7 +249,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 	if (FuncIterator && (FuncIterator->PropertyFlags & CPF_Parm))
 	{
 		//Predicate has additional Remaining Parameters! This shouldn't be called at all since I checked Param count...
-		XYAH_LOG(Warning, TEXT("(%s)! Function (%s) has additional parameters. Please remove these and try again.")
+		XYAH_LIB_LOG(Warning, TEXT("(%s)! Function (%s) has additional parameters. Please remove these and try again.")
 			, *ErrorString
 			, *FunctionName.ToString());
 		return nullptr;

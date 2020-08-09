@@ -21,11 +21,6 @@ FORCEINLINE DEFINE_FUNCTION(UXyahActorLibrary::execBP_GetAllActorsOfClass)
 	P_NATIVE_END;
 }
 
-FORCEINLINE DEFINE_FUNCTION(UXyahActorLibrary::execBP_SpawnActorDeferred)
-{
-
-}
-
 template<typename FilterPredicate>
 bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors, FilterPredicate FilterPred)

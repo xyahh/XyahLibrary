@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "XyahLibraryCore.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "UObject/UnrealType.h"
@@ -106,6 +106,14 @@ public:
 //C++ Only
 public: 
 
+	template<typename ArrayElement>
+	static ArrayElement GetRandom(const TArray<ArrayElement>& InArray);
+
+	template<typename ArrayElement, typename Predicate>
+	static bool AnyIf(const TArray<ArrayElement>& InArray, Predicate Pred);
+
+	template<typename ArrayElement, typename Predicate>
+	static bool AllIf(const TArray<ArrayElement>& InArray, Predicate Pred);
 
 //Internal Funcs 
 protected:
@@ -137,6 +145,7 @@ public:
 	DECLARE_FUNCTION(execBP_AnyIf);
 	DECLARE_FUNCTION(execBP_AllIf);
 };
+
 
 #if XYAH_ARRAY_LIBRARY
 #include "XyahArrayLibrary.inl"

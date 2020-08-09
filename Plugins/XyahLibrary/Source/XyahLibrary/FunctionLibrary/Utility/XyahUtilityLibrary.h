@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "XyahLibraryCore.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "XyahUtilityLibrary.generated.h"
@@ -66,13 +66,8 @@ public:
 	@param bNewerOnTop - Whether to put this Log at the Top, or stack them below
 	@param TextScale - the Scale of the Text (default 1.f)
 	*/
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay = "1", DevelopmentOnly))
-	static void PrintMessage(const FString& Message = FString(TEXT("Xyah Library"))
-		, int32 LogID = -1, bool bPrintToScreen = true
-		, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-		, bool bPrintToLog = true
-		, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahConsoleColor")) int32 ConsoleTextColor = 15
-		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay="1", AutoCreateRefTerm="Settings", DevelopmentOnly))
+	static void PrintMessage(const FString& Message, const FXyahPrintSettings& Settings);
 
 
 	/*
@@ -85,7 +80,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (AutoCreateRefTerm = "ExcludeParents", AdvancedDisplay = "bIncludeReplicated,bIncludeNonReplicated"))
 	static void GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
 	, TMap<FString, FString>& OutProperties
-	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 PropertyFlags = 0);
+	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 PropertyFlags = 2);
 
 	/*
 	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be in Simple Object Text Format
@@ -113,10 +108,7 @@ public:
 
 	//A Convenience Func for the PrintMessage Func
 	template<class... Args>
-	static void Print(const FString& Format, Args&&... Arguments, int32 LogID = -1
-		, bool bPrintToScreen = true, FLinearColor ScreenTextColor = FLinearColor(0.0, 0.66, 1.0)
-		, bool bPrintToLog = true, int32 ConsoleTextColor = 15
-		, float Duration = 2.f, bool bNewerOnTop = true, float TextScale = 1.f);
+	static void Print(const FXyahPrintSettings& Settings, const FString& Format, Args&&... Arguments);
 	
 	//Finds a Function from a Given Object
 	static UFunction* FindFunction(const UObject* Object, FName FunctionName
@@ -161,6 +153,7 @@ public:
 		P_NATIVE_END;
 	}
 };
+
 
 #if XYAH_UTILITY_LIBRARY
 #include "XyahUtilityLibrary.inl"

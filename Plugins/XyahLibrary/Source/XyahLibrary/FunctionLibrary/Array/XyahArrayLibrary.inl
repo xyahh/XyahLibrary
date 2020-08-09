@@ -2,6 +2,39 @@
 
 #pragma once
 
+template<typename ArrayElement>
+ArrayElement UXyahArrayLibrary::GetRandom(const TArray<ArrayElement>& InArray)
+{
+	if(InArray.Num() > 0)
+		return InArray[FMath::Rand() % InArray.Num()];
+	XYAH_LIB_LOG(Warning, TEXT("Attempting to get Random Element from Empty Array!"));
+	return ArrayElement{};
+}
+
+template<typename ArrayElement, typename Predicate>
+bool UXyahArrayLibrary::AnyIf(const TArray<ArrayElement>& InArray, Predicate Pred)
+{
+	for (auto& i : InArray)
+	{
+		if (Pred(i))
+			return true;
+	}
+	return false;
+}
+
+template<typename ArrayElement, typename Predicate>
+bool UXyahArrayLibrary::AllIf(const TArray<ArrayElement>& InArray, Predicate Pred)
+{
+	for (auto& i : InArray)
+	{
+		if (!Pred(i))
+			return false;
+	}
+	return true;
+}
+
+
+
 //Exec Funcs
 FORCEINLINE DEFINE_FUNCTION(UXyahArrayLibrary::execBP_GetRandom)
 {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "XyahLibrary.h"
+#include "XyahLibraryCore.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahMathLibrary.generated.h"
 
@@ -28,8 +28,9 @@ public:
 
 /* SUM */
 
+	//Gets the Sum of all the Elements in the Array. ResultSum must be initialized to Zero
 	template<typename ElementType, typename SumType=ElementType>
-	static SumType GetSum(const TArray<ElementType>& InArray);
+	static void GetSum(const TArray<ElementType>& InArray, SumType& ResultSum);
 
 	//Gets the Sum of all the Elements in the Array
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Sum Integer Array", CompactNodeTitle = "SUM", Keywords = "add"))
@@ -49,8 +50,9 @@ public:
 	
 /* AVERAGE */
 
+	//Gets the Average of all the Elements in the Array. ResultAverage must be initialized to Zero
 	template<typename ElementType, typename AverageType = float>
-	static AverageType GetAverage(const TArray<ElementType>& InArray);
+	static void GetAverage(const TArray<ElementType>& InArray, AverageType& ResultAverage);
 
 	//Gets the Average of all the Elements in the Array
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Get Average Integer", CompactNodeTitle = "AVG", Keywords = "mean avg"))

@@ -1,5 +1,7 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
-#include "XyahLibraryHub.h"
+#include "XyahLibraryCore.h"
+
+DEFINE_LOG_CATEGORY(XyahLibLog);
 
 uint64 ConvertXyahPropertyFlags(int32 XyahPropertyFlags)
 {

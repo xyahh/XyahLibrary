@@ -11,8 +11,6 @@
 #include "ISettingsContainer.h"
 #endif
 
-DEFINE_LOG_CATEGORY(XyahLog);
-
 void FXyahLibraryModule::StartupModule()
 {
 	RegisterSettings();

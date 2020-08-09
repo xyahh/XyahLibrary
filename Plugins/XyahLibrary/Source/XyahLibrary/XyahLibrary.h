@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "XyahLibraryHub.h"
-
 
 class FXyahLibraryModule : public IModuleInterface
 {

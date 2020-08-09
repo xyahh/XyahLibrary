@@ -101,7 +101,7 @@ bool UXyahArrayLibrary::Generic_Sort(void* TargetArray, const FArrayProperty* Ar
 		}
 		else
 		{
-			XYAH_LOG(Log, TEXT("Sort did not take place! Array Element count less 2!"));
+			XYAH_LIB_LOG(Log, TEXT("Sort did not take place! Array Element count less 2!"));
 		}
 	}
 	return false;
@@ -159,7 +159,7 @@ bool UXyahArrayLibrary::Generic_RemoveIf(void* TargetArray, const FArrayProperty
 		}
 		else
 		{
-			XYAH_LOG(Log, TEXT("RemoveIf did not take place! Array Element count is 0!"));
+			XYAH_LIB_LOG(Log, TEXT("RemoveIf did not take place! Array Element count is 0!"));
 		}
 	}
 	return false;
@@ -221,7 +221,7 @@ bool UXyahArrayLibrary::Generic_FindIf(void* TargetArray, void* OutTargetArray, 
 		}
 		else
 		{
-			XYAH_LOG(Log, TEXT("FindIf did not take place! Array Element count is 0!"));
+			XYAH_LIB_LOG(Log, TEXT("FindIf did not take place! Array Element count is 0!"));
 		}
 	}
 	return false;
@@ -281,7 +281,7 @@ bool UXyahArrayLibrary::Generic_AllIf(void* TargetArray, const FArrayProperty* A
 		}
 		else
 		{
-			XYAH_LOG(Log, TEXT("AllIf did not take place! Array Element count is 0!"));
+			XYAH_LIB_LOG(Log, TEXT("AllIf did not take place! Array Element count is 0!"));
 		}
 	}
 	return false;
@@ -340,7 +340,7 @@ bool UXyahArrayLibrary::Generic_AnyIf(void* TargetArray, const FArrayProperty* A
 		}
 		else
 		{
-			XYAH_LOG(Log, TEXT("AnyIf did not take place! Array Element count is 0!"));
+			XYAH_LIB_LOG(Log, TEXT("AnyIf did not take place! Array Element count is 0!"));
 		}
 	}
 	return false;

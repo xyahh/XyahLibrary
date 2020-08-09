@@ -14,11 +14,6 @@ bool UXyahActorLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
-bool UXyahActorLibrary::BP_SpawnActorDeferred(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, AActor*& SpawnedActor, const FTransform& WorldTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride /*= ESpawnActorCollisionHandlingMethod::Undefined */, AActor* SpawnedActorOwner /*= nullptr */, FName PreBeginPlayFunction /*= NAME_None */, UObject* FunctionOwner /*= nullptr*/)
-{
-	XYAH_SHOULD_NEVER_HIT_THIS(false);
-}
-
 bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)
 {

@@ -3,22 +3,20 @@
 #pragma once
 
 template<typename ElementType, typename SumType>
-SumType UXyahMathLibrary::GetSum(const TArray<ElementType>& InArray)
+void UXyahMathLibrary::GetSum(const TArray<ElementType>& InArray, SumType& ResultSum)
 {
-	SumType ResultSum{};
 	for (auto& i : InArray)
 		ResultSum += static_cast<SumType>(i);
-	return ResultSum;
 }
 
 template<typename ElementType, typename AverageType>
-AverageType UXyahMathLibrary::GetAverage(const TArray<ElementType>& InArray)
+void UXyahMathLibrary::GetAverage(const TArray<ElementType>& InArray, AverageType& ResultAverage)
 {
 	if (InArray.Num() > 0)
-		// Dividing by float because it should be supported by all AverageTypes (e.g. FVector)
-		return	static_cast<AverageType>(GetSum<ElementType, AverageType>(InArray) / static_cast<float>(InArray.Num()));
-	else
-		return AverageType{};
+	{
+		GetSum(InArray, ResultAverage);
+		ResultAverage /= static_cast<float>(InArray.Num());
+	}
 }
 
 template<typename ElementType>

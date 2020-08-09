@@ -5,16 +5,19 @@
 FString UXyahMathLibrary::ToBinaryString(int32 Number, bool bIncludeLeftZeros)
 {
 	FString OutString;
-	if(bIncludeLeftZeros)
-		OutString.AppendChars(TEXT("0"), 32); //int32 would have 32 entries
-	else
-		OutString.AppendChars(TEXT("0"), FMath::FloorLog2(Number) + 1);
+	int32 BinaryLength= 32;
+	if(false == bIncludeLeftZeros)
+		BinaryLength = FMath::FloorLog2(Number) + 1;
 
+	OutString.Reserve(BinaryLength);
 	int32 CurrentNumber = 1;
-	for (int32 i = 0; i < 32; ++i)
+	for (int32 i = 0; i < BinaryLength; ++i)
 	{
 		if (CurrentNumber & Number)
-			OutString[31 - i] = TEXT('1');
+			OutString = TEXT("1") + OutString;
+		else
+			OutString = TEXT("0") + OutString;
+
 		CurrentNumber *= 2;
 		if(CurrentNumber > Number && bIncludeLeftZeros == false)
 			break;
@@ -24,42 +27,58 @@ FString UXyahMathLibrary::ToBinaryString(int32 Number, bool bIncludeLeftZeros)
 
 int32 UXyahMathLibrary::GetSum_Integer(const TArray<int32>& InArray)
 {
-	return GetSum(InArray);
+	int32 Sum = 0;
+	GetSum(InArray, Sum);
+	return Sum;
 }
 
 float UXyahMathLibrary::GetSum_Float(const TArray<float>& InArray)
 {
-	return GetSum(InArray);
+	float Sum = 0;
+	GetSum(InArray, Sum);
+	return Sum;
 }
 
 int32 UXyahMathLibrary::GetSum_Bool(const TArray<bool>& InArray)
 {
-	return GetSum<bool, int32>(InArray);
+	int32 Sum = 0;
+	GetSum(InArray, Sum);
+	return Sum;
 }
 
 FVector UXyahMathLibrary::GetSum_Vector(const TArray<FVector>& InArray)
 {
-	return GetSum(InArray);
+	FVector Sum = FVector::ZeroVector;
+	GetSum(InArray, Sum);
+	return Sum;
 }
 
 float UXyahMathLibrary::GetAverage_Integer(const TArray<int32>& InArray)
 {
-	return GetAverage(InArray);
+	float Average = 0.f;
+	GetAverage(InArray, Average);
+	return Average;
 }
 
 float UXyahMathLibrary::GetAverage_Float(const TArray<float>& InArray)
 {
-	return GetAverage(InArray);
+	float Average = 0.f;
+	GetAverage(InArray, Average);
+	return Average;
 }
 
 float UXyahMathLibrary::GetAverage_Bool(const TArray<bool>& InArray)
 {
-	return GetAverage(InArray);
+	float Average = 0.f;
+	GetAverage(InArray, Average);
+	return Average;
 }
 
 FVector UXyahMathLibrary::GetAverage_Vector(const TArray<FVector>& InArray)
 {
-	return GetAverage<FVector, FVector>(InArray);
+	FVector Average = FVector::ZeroVector;
+	GetAverage(InArray, Average);
+	return Average;
 }
 
 float UXyahMathLibrary::GetMedian_Integer(const TArray<int32>& InArray, bool bRequiresSort)

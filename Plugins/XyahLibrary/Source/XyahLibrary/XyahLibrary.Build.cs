@@ -18,7 +18,8 @@ public class XyahLibrary : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"XyahLibrary",
-				"XyahLibrary/Library",
+				"XyahLibrary/FunctionLibrary",
+                "XyahLibrary/FunctionLibrary/Core",
 				"XyahLibrary/Settings",
 				// ... add other private include paths required here ...
 			}
@@ -41,7 +42,9 @@ public class XyahLibrary : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				// ... add private dependencies that you statically link with here ...	
+				"UnrealEd",
+                "KismetCompiler",
+				"BlueprintGraph",
 			}
 			);
 		
