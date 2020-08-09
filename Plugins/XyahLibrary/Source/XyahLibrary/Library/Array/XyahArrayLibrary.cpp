@@ -1,35 +1,34 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahArrayLibrary.h"
-#include "../Utility/XyahUtilityLibrary.h"
+#include "Utility/XyahUtilityLibrary.h"
 
-
-void UXyahArrayLibrary::GetRandom(const TArray<int32>& Array, int32& OutRandomElement)
+void UXyahArrayLibrary::BP_GetRandom(const TArray<int32>& Array, int32& OutRandomElement)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS();
 }
 
-bool UXyahArrayLibrary::Sort(const TArray<int32>& Array, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+bool UXyahArrayLibrary::BP_Sort(const TArray<int32>& Array, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
 
-bool UXyahArrayLibrary::RemoveIf(const TArray<int32>& Array, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+bool UXyahArrayLibrary::BP_RemoveIf(const TArray<int32>& Array, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
 
-bool UXyahArrayLibrary::FindIf(const TArray<int32>& Array, TArray<int32>& OutArray, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+bool UXyahArrayLibrary::BP_FindIf(const TArray<int32>& Array, TArray<int32>& OutArray, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
 
-bool UXyahArrayLibrary::AnyIf(const TArray<int32>& Array, bool& bOutAnyIfReturn, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+bool UXyahArrayLibrary::BP_AnyIf(const TArray<int32>& Array, bool& bOutAnyIfReturn, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
 
-bool UXyahArrayLibrary::AllIf(const TArray<int32>& Array, bool& bOutAllIfReturn, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+bool UXyahArrayLibrary::BP_AllIf(const TArray<int32>& Array, bool& bOutAllIfReturn, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
@@ -43,7 +42,6 @@ void UXyahArrayLibrary::Generic_GetRandom(void* TargetArray, const FArrayPropert
 			ArrayProp->Inner->CopyCompleteValueFromScriptVM(OutItem, ArrayHelper.GetRawPtr(FMath::RandHelper(ArrayHelper.Num())));
 	}
 }
-
 
 bool UXyahArrayLibrary::Generic_Sort(void* TargetArray, const FArrayProperty* ArrayProp, UObject* FuncOwner
 	, FName PredicateFunctionName)

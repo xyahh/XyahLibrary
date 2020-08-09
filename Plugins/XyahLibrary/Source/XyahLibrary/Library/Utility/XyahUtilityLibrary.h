@@ -3,12 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../XyahLibrary.h"
+#include "XyahLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "XyahUtilityLibrary.generated.h"
-
-class UXyahBaseSettings;
 
 /**
  * 
@@ -20,22 +18,6 @@ class XYAHLIBRARY_API UXyahUtilityLibrary : public UBlueprintFunctionLibrary
 	
 //Blueprints Only
 protected:
-
-	/*
-	Gets all the Actors of a Given Class but first Filters out all the actors whose class belongs in the ClassesToIgnore set.
-	Additionally, if present and valid, the Filter Function will be called for every actor filtered after the ClassesToIgnore. 
-	If the Function returns true, the actor will be kept in the Output list, else it will be filtered out of the list.
-
-	@param ClassesToIgnore - The Subclasses of the ActorClass to NOT consider and be left out.
-	@param FilterFunctionName - The Name of the Function to call, if not specified, this extra Filtering Stage will not take place and return immediately. If specified this Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
-	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
-
-	@param OutActors - The filtered list of actors
-	@return [bool] Whether GetAllActorsOfClass actually took place or if the given Filter Function was not found.
-	*/
-	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Utility", meta = (WorldContext = "WorldContextObject", DeterminesOutputType = "ActorClass", DynamicOutputParam = "OutActors", AutoCreateRefTerm = "ClassesToIgnore", AdvancedDisplay = "ClassesToIgnore,FilterFunctionName,FunctionOwner"))
-	static bool GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
-		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName = NAME_None, UObject* FunctionOwner = nullptr);
 
 	/*
 	Returns the Input as a String in the Simple Object Text Format.
@@ -57,9 +39,6 @@ protected:
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "RefValue"))
 	static bool FromString(const FString& InString, UPARAM(Ref) int32& RefValue);
 
-//Blueprints & C++ 
-public:
-
 	/*
 	Gets the Class Default Object, as Mutable (use with Care!)
 	@param ObjectClass - The class to get the Default Object from
@@ -71,6 +50,9 @@ public:
 	//Same as GetClassDefaultObject, but for Settings Only
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (DeterminesOutputType = "SettingsClass", DynamicOutputParam = "OutSettings"))
 	static void GetSettings(TSubclassOf<UXyahSettings> SettingsClass, UXyahSettings*& OutSettings);
+
+//Blueprints & C++ 
+public:
 
 	/* 
 	Prints a String to either the Screen, Log, or both. 
@@ -117,6 +99,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue);
 
+//Blueprint/C++ Internal Funcs
 protected:
 
 	static bool GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue);
@@ -125,7 +108,8 @@ protected:
 public:
 
 	//Checks whether two properties are of the same class, type, etc. Additional checks such as Offsets, Names are also available
-	static bool CheckProperties(const FProperty* A, const FProperty* B, bool bCheckPropertyOffsets = false, bool bCheckPropertyNames = false);
+	static bool CheckProperties(const FProperty* A, const FProperty* B
+	, bool bCheckPropertyOffsets = false, bool bCheckPropertyNames = false);
 
 	//A Convenience Func for the PrintMessage Func
 	template<class... Args>
@@ -139,36 +123,14 @@ public:
 		, const FString& ErrorString, FProperty* InnerProperty, int32 ExpectedInputParams);
 
 
-//ExecFuncs
+//Generic Funcs
 public:
-
-	static void Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, FProperty* ArrayInnerProperty
-		, TArray<AActor*>& OutActors
-		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName, UObject* FuncOwner);
 
 	static bool Generic_ToString(FProperty* Property, void* Data, FString& OutString);
 	static bool Generic_FromString(const FString& InString, FProperty* Property, void* Data);
 
+//Exec Funcs
 public:
-
-	DECLARE_FUNCTION(execGetAllActorsOfClass)
-	{
-		P_GET_OBJECT(UObject, WorldContextObject);
-		P_GET_OBJECT(UClass, ActorClass);
-
-		P_GET_TARRAY_REF(AActor*, OutActors);
-		FArrayProperty* ActorProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
-
-		P_GET_TSET_REF(TSubclassOf<AActor>, ClassesToIgnore);
-		P_GET_PROPERTY(FNameProperty, FilterFuncName);
-		P_GET_PROPERTY(FObjectProperty, FuncOwner);
-		P_FINISH;
-		P_NATIVE_BEGIN;
-
-		//No need to Mark property as dirty since we are getting TArrayRef
-		Generic_GetAllActorsOfClass(WorldContextObject, ActorClass, ActorProperty ? ActorProperty->Inner : nullptr, OutActors, ClassesToIgnore, FilterFuncName, IsValid(FuncOwner) ? FuncOwner : XYAH_GET_OBJECT);
-		P_NATIVE_END;
-	}
 
 	DECLARE_FUNCTION(execToString)
 	{

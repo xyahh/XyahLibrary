@@ -8,6 +8,7 @@ uint64 ConvertXyahPropertyFlags(int32 XyahPropertyFlags)
 		OutPropertyFlags |= static_cast<uint64>(EPropertyFlags::CPF_##PropertyFlag);
 
 	uint64 OutPropertyFlags = 0;
+
 	CONVERT(DisableEditOnInstance);
 	CONVERT(BlueprintVisible);
 	CONVERT(BlueprintReadOnly);

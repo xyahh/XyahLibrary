@@ -3,25 +3,30 @@
 #pragma once
 #include "CoreMinimal.h"
 
-/* XYAH LOGS */
 #define XYAH(Lib) UXyah##Lib##Library::
+
+/* XYAH LOGS */
 DECLARE_LOG_CATEGORY_EXTERN(XyahLog, Log, All);
 #define XYAH_LOG(Verbosity, Format, ...) UE_LOG(XyahLog, Verbosity, Format, __VA_ARGS__)
+
 
 /* XYAH LIBRARY DEFINITIONS */
 #define XYAH_UTILITY_LIBRARY	1
 #define XYAH_MATH_LIBRARY		1
 #define XYAH_ARRAY_LIBRARY		1
+#define XYAH_ACTOR_LIBRARY		1
+#define XYAH_MAP_LIBRARY		1
+
 
 /* XYAH TYPES */
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum EXyahConsoleColor
 {
-	XCC_Dark	= 0	UMETA(Hidden),
-	XCC_Red		= 1	UMETA(DisplayName = "Red"),
-	XCC_Green	= 2	UMETA(DisplayName = "Green"),
-	XCC_Blue	= 4	UMETA(DisplayName = "Blue"),
-	XCC_Light	= 8	UMETA(DisplayName = "Light"),
+	XCC_Dark	= 0			UMETA(Hidden),
+	XCC_Red		= 1 << 1	UMETA(DisplayName = "Red"),
+	XCC_Green	= 1	<< 2	UMETA(DisplayName = "Green"),
+	XCC_Blue	= 1	<< 3	UMETA(DisplayName = "Blue"),
+	XCC_Light	= 1	<< 4	UMETA(DisplayName = "Light"),
 };
 
 
@@ -39,7 +44,11 @@ enum EXyahPropertyFlags
 	XPF_Transient				= 1 << 8 UMETA(DisplayName = "Transient", ToolTip = "Property is transient: shouldn't be saved or loaded, except for Blueprint CDOs.")
 };
 
+/* XYAH GLOBAL FUNCS */
+
+//Converts EXyahPropertyFlags to EPropertyFlags 
 uint64 ConvertXyahPropertyFlags(int32 XyahPropertyFlags);
+
 
 /* XYAH HELPER MACROS */
 #define XYAH_GET_PROPERTY_AND_ADDRESS(PropertyType, AddrName, PropertyName) Stack.MostRecentProperty = nullptr; \

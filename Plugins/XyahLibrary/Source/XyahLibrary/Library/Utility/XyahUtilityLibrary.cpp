@@ -1,20 +1,10 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahUtilityLibrary.h"
-#include "../Math/XyahMathLibrary.h"
-
+#include "Math/XyahMathLibrary.h"
 #include "Engine/Engine.h"
-#include "EngineUtils.h"
-#include "Engine/World.h"
 
 // Blueprint ONLY
-
-bool UXyahUtilityLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
-	, const TSet<TSubclassOf<AActor>>& ClassesToIgnore
-	, FName FilterFunction /*= NAME_None*/, UObject* FunctionOwner /*= nullptr*/)
-{
-	XYAH_SHOULD_NEVER_HIT_THIS(false);
-}
 
 bool UXyahUtilityLibrary::ToString(int32 InValue, FString& OutString)
 {
@@ -39,14 +29,14 @@ void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, 
 
 //Blueprint & C++
 void UXyahUtilityLibrary::PrintMessage(const FString& Message /*= FString(TEXT("Xyah Library"))*/, int32 LogID /*= -1 */, bool bPrintToScreen /*= true*/
-	, FLinearColor ScreenTextColor /*= FLinearColor(0.0, 0.66, 1.0) */, bool bPrintToLog /*= true*/, int32 ConsoleTextColor /*= 0x1111 */
+	, FLinearColor ScreenTextColor /*= FLinearColor(0.0, 0.66, 1.0) */, bool bPrintToLog /*= true*/, int32 ConsoleTextColor /*= 15 */
 	, float Duration /*= 2.f*/, bool bNewerOnTop /*= true*/, float TextScale /*= 1.f*/)
 {
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 
 	if (bPrintToLog)
 	{
-		FString BinaryString(4, *XYAH(Math) ToBinaryString(ConsoleTextColor).Reverse());
+		FString BinaryString(4, *XYAH(Math) ToBinaryString(ConsoleTextColor, true).Reverse());
 		SET_WARN_COLOR(*BinaryString);
 		XYAH_LOG(Log, TEXT("%s"), *Message);
 		CLEAR_WARN_COLOR();
@@ -68,7 +58,6 @@ void UXyahUtilityLibrary::PrintMessage(const FString& Message /*= FString(TEXT("
 		}
 	}
 #endif
-
 }
 
 void UXyahUtilityLibrary::GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
@@ -268,75 +257,6 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 	}
 
 	return Function;
-}
-
-void UXyahUtilityLibrary::Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, FProperty* ArrayInnerProperty
-	, TArray<AActor*>& OutActors,  const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName, UObject* FuncOwner)
-{
-	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
-	{
-		UFunction* FilterFunc = 0;
-		uint8* FilterFuncParams = 0;
-
-		if (FilterFunctionName != NAME_None)
-		{
-			FilterFunc = FindFunction(FuncOwner, FilterFunctionName, TEXT("Get All Actor of Class Error"),  ArrayInnerProperty , 1);
-			if (FilterFunc)
-				FilterFuncParams = (uint8*)FMemory_Alloca(FilterFunc->ParmsSize);
-		}
-
-		bool bNotIgnoringClasses = (ClassesToIgnore.Num() == 0);
-
-		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
-		{
-			AActor* Actor = *It;
-			if (ClassesToIgnore.Contains(Actor->GetClass()))
-				continue;
-
-			bool bAddActor = true;
-
-			if (FilterFunc)
-			{
-				bAddActor = false;
-				FMemory::Memzero(FilterFuncParams, FilterFunc->ParmsSize);
-				int32 ParamsProcessed = 0;
-				uint8* ReturnParam = 0;
-				for (TFieldIterator<FProperty> PropIter(FilterFunc); PropIter && (PropIter->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++PropIter)
-				{
-					switch (ParamsProcessed)
-					{
-					case 0: 
-						//The Prop Iter SHOULD be an Actor Property (i.e. FObjectProperty)
-						if (FObjectProperty* ObjProp = CastField<FObjectProperty>(*PropIter))
-							ObjProp->SetPropertyValue_InContainer(PropIter->ContainerPtrToValuePtr<uint8>(FilterFuncParams), Actor);
-						break;
-					default: 
-						ReturnParam = PropIter->ContainerPtrToValuePtr<uint8>(FilterFuncParams); break;
-					}
-
-					++ParamsProcessed;
-					if (ParamsProcessed >= 2)
-						break;
-				}
-				FuncOwner->ProcessEvent(FilterFunc, FilterFuncParams);
-				if (bool* ReturnBool = (bool*)ReturnParam)
-					bAddActor = *ReturnBool;
-			}
-
-			if (bAddActor)
-				OutActors.Add(Actor);
-		}
-
-
-		if (FilterFunc)
-		{
-			//Destroy Allocations
-			for (TFieldIterator<FProperty> PropIter(FilterFunc); PropIter && (PropIter->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++PropIter)
-			{
-				PropIter->DestroyValue_InContainer(FilterFuncParams);
-			}
-		}
-	}
 }
 
 bool UXyahUtilityLibrary::Generic_ToString(FProperty* Property, void* Data, FString& OutString)

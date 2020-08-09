@@ -17,6 +17,9 @@ public class XyahLibrary : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
+				"XyahLibrary",
+				"XyahLibrary/Library",
+				"XyahLibrary/Settings",
 				// ... add other private include paths required here ...
 			}
 			);

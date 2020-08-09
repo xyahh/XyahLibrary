@@ -2,15 +2,22 @@
 
 #include "XyahMathLibrary.h"
 
-FString UXyahMathLibrary::ToBinaryString(int32 Number)
+FString UXyahMathLibrary::ToBinaryString(int32 Number, bool bIncludeLeftZeros)
 {
-	FString OutString(TEXT("00000000000000000000000000000000"));
+	FString OutString;
+	if(bIncludeLeftZeros)
+		OutString.AppendChars(TEXT("0"), 32); //int32 would have 32 entries
+	else
+		OutString.AppendChars(TEXT("0"), FMath::FloorLog2(Number) + 1);
+
 	int32 CurrentNumber = 1;
-	for (int32 i = 0; i < 32 && CurrentNumber <= Number; ++i)
+	for (int32 i = 0; i < 32; ++i)
 	{
 		if (CurrentNumber & Number)
 			OutString[31 - i] = TEXT('1');
 		CurrentNumber *= 2;
+		if(CurrentNumber > Number && bIncludeLeftZeros == false)
+			break;
 	}
 	return OutString;
 }

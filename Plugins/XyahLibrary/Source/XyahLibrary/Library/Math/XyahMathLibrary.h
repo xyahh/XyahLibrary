@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../XyahLibrary.h"
+#include "XyahLibrary.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahMathLibrary.generated.h"
 
@@ -18,8 +18,13 @@ class XYAHLIBRARY_API UXyahMathLibrary : public UBlueprintFunctionLibrary
 public:
 
 	//Converts a given Integer Number to a String expressing the Number in Binary Form
+	/*
+	Converts a given Integer Number to a String expressing it in Binary Form
+	@param Number - the Decimal Number to convert to Binary
+	@param bIncludeLeftZeros - whether to include the left zeros (e.g. 00001010) or not (e.g. 1010)
+	*/
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math")
-	static FString ToBinaryString(int32 Number);
+	static FString ToBinaryString(int32 Number, bool bIncludeLeftZeros);
 
 /* SUM */
 
@@ -99,8 +104,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Get Range Vector"))
 	static void GetRange_Vector(const TArray<FVector>& InArray, FVector& Min, FVector& Max);
 };
-
-
 
 
 #if XYAH_MATH_LIBRARY
