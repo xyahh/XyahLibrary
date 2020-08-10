@@ -45,7 +45,9 @@ public class XyahLibrary : ModuleRules
 				"UnrealEd",
                 "KismetCompiler",
 				"BlueprintGraph",
-			}
+				"Kismet",
+				"KismetWidgets",
+            }
 			);
 		
 		

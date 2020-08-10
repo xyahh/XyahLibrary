@@ -1,27 +1,37 @@
-// Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
+// Copyright (C), Juan Marcelo Portillo. All Rights Reserved
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
 #include "K2Node.h"
+#include "K2Node_SpawnActorFromClass.h"
 #include "K2Node_SpawnActorDeferred.generated.h"
 
+class FBlueprintActionDatabaseRegistrar;
+class UEdGraph;
+
 UCLASS()
-class UK2Node_SpawnActorDeferred : public UK2Node
+class XYAHLIBRARY_API UK2Node_SpawnActorDeferred : public UK2Node_SpawnActorFromClass
 {
-	GENERATED_BODY()	
-//UEdGraphNode
+	GENERATED_UCLASS_BODY()
+
 public:
 
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
-	virtual FText GetTooltipText() const override;
-	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
-//UK2Node
-public:
-
-	virtual FText GetMenuCategory() const override;
+	virtual bool IsSpawnVarPin(UEdGraphPin* Pin) const override;
 	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
-	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 
+protected:
+
+	UEdGraphPin* GetPreSpawnPin() const;
+	/** Get the spawn transform input pin */
+	UEdGraphPin* GetSpawnTransformPin_Child() const;
+	/** Get the collision handling method input pin */
+	UEdGraphPin* GetCollisionHandlingOverridePin_Child() const;
+	/** Get the actor owner pin */
+	UEdGraphPin* GetOwnerPin_Child() const;
+
+	void MaybeUpdateCollisionPin_Child(TArray<UEdGraphPin*>& OldPins);
 };
