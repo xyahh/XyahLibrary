@@ -26,6 +26,7 @@ public:
 protected:
 
 	UEdGraphPin* GetPreSpawnPin() const;
+	UEdGraphPin* GetPostSpawnPin() const;
 	/** Get the spawn transform input pin */
 	UEdGraphPin* GetSpawnTransformPin_Child() const;
 	/** Get the collision handling method input pin */

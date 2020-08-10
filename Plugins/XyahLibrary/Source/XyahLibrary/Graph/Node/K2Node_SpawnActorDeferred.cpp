@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright (C), Juan Marcelo Portillo. All Rights Reserved
 
 #include "K2Node_SpawnActorDeferred.h"
 #include "UObject/UnrealType.h"
@@ -20,23 +20,17 @@
 namespace XyahNodeHelper
 {
 	static const FName PreSpawnExec(TEXT("PreSpawn"));
-};
+	static const FName PostSpawnExec(TEXT("PostSpawn"));
 
-/* Copied from K2Node_SpawnActorFromClass*/
-struct FK2Node_SpawnActorFromClassHelper
-{
-	static const FName SpawnTransformPinName;
-	static const FName SpawnEvenIfCollidingPinName;
-	static const FName NoCollisionFailPinName;
-	static const FName CollisionHandlingOverridePinName;
-	static const FName OwnerPinName;
-};
+	static const FName WorldContextPinName(TEXT("WorldContext"));
+	static const FName ClassPinName(TEXT("Class"));
 
-const FName FK2Node_SpawnActorFromClassHelper::SpawnTransformPinName(TEXT("SpawnTransform"));
-const FName FK2Node_SpawnActorFromClassHelper::SpawnEvenIfCollidingPinName(TEXT("SpawnEvenIfColliding"));		// deprecated pin, name kept for backwards compat
-const FName FK2Node_SpawnActorFromClassHelper::NoCollisionFailPinName(TEXT("bNoCollisionFail"));		// deprecated pin, name kept for backwards compat
-const FName FK2Node_SpawnActorFromClassHelper::CollisionHandlingOverridePinName(TEXT("CollisionHandlingOverride"));
-const FName FK2Node_SpawnActorFromClassHelper::OwnerPinName(TEXT("Owner"));
+	static const FName SpawnTransformPinName(TEXT("SpawnTransform"));
+	static const FName SpawnEvenIfCollidingPinName(TEXT("SpawnEvenIfColliding"));
+	static const FName NoCollisionFailPinName(TEXT("bNoCollisionFail"));
+	static const FName CollisionHandlingOverridePinName(TEXT("CollisionHandlingOverride"));
+	static const FName OwnerPinName(TEXT("Owner"));
+};
 
 #define LOCTEXT_NAMESPACE "K2Node_SpawnActorDeferred"
 
@@ -47,9 +41,41 @@ UK2Node_SpawnActorDeferred::UK2Node_SpawnActorDeferred(const FObjectInitializer&
 
 void UK2Node_SpawnActorDeferred::AllocateDefaultPins()
 {
+	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, XyahNodeHelper::PreSpawnExec);
-	Super::AllocateDefaultPins();
+	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, XyahNodeHelper::PostSpawnExec);
 
+	// If required add the world context pin
+	if (UseWorldContext())
+	{
+		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UObject::StaticClass(), XyahNodeHelper::WorldContextPinName);
+	}
+
+	// Add blueprint pin
+	UEdGraphPin* ClassPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Class, GetClassPinBaseClass(), XyahNodeHelper::ClassPinName);
+
+	// Result pin
+	UEdGraphPin* ResultPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Object, GetClassPinBaseClass(), UEdGraphSchema_K2::PN_ReturnValue);
+
+	UScriptStruct* TransformStruct = TBaseStructure<FTransform>::Get();
+	UEdGraphPin* TransformPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Struct, TransformStruct, XyahNodeHelper::SpawnTransformPinName);
+	FTransform DefaultTransform;
+	TransformPin->DefaultValue = DefaultTransform.ToString();
+
+	// Collision handling method pin
+	UEnum* const MethodEnum = FindObjectChecked<UEnum>(ANY_PACKAGE, TEXT("ESpawnActorCollisionHandlingMethod"), true);
+	UEdGraphPin* const CollisionHandlingOverridePin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Byte, MethodEnum, XyahNodeHelper::CollisionHandlingOverridePinName);
+	CollisionHandlingOverridePin->DefaultValue = MethodEnum->GetNameStringByValue(static_cast<int>(ESpawnActorCollisionHandlingMethod::Undefined));
+
+	UEdGraphPin* OwnerPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, AActor::StaticClass(), XyahNodeHelper::OwnerPinName);
+	OwnerPin->bAdvancedView = true;
+	if (ENodeAdvancedPins::NoPins == AdvancedPinDisplay)
+	{
+		AdvancedPinDisplay = ENodeAdvancedPins::Hidden;
+	}
+
+	//Skip ConstructObject + Spawn Actors from Class
+	UK2Node::AllocateDefaultPins();
 }
 
 FText UK2Node_SpawnActorDeferred::GetNodeTitle(ENodeTitleType::Type TitleType) const
@@ -98,11 +124,13 @@ FText UK2Node_SpawnActorDeferred::GetNodeTitle(ENodeTitleType::Type TitleType) c
 bool UK2Node_SpawnActorDeferred::IsSpawnVarPin(UEdGraphPin* Pin) const
 {
 	return(Super::IsSpawnVarPin(Pin) &&
-		Pin->PinName != XyahNodeHelper::PreSpawnExec);
+		Pin->PinName != XyahNodeHelper::PreSpawnExec &&
+		Pin->PinName != XyahNodeHelper::PostSpawnExec);
 }
 
 #include "K2Node_ExecutionSequence.h"
 #include "K2Node_VariableGet.h"
+//Similar to UK2Node_SpawnActorFromClass, but adding our "PreSpawn" logic
 void UK2Node_SpawnActorDeferred::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	//Skip the SpawnActorfromClass Expand Node
@@ -125,12 +153,13 @@ void UK2Node_SpawnActorDeferred::ExpandNode(class FKismetCompilerContext& Compil
 	UK2Node_SpawnActorDeferred* SpawnNode = this;
 	UEdGraphPin* SpawnNodeExec = SpawnNode->GetExecPin();
 	UEdGraphPin* SpawnNodePreSpawn = SpawnNode->GetPreSpawnPin();
+	UEdGraphPin* SpawnNodePostSpawn = SpawnNode->GetPostSpawnPin();
+
 	UEdGraphPin* SpawnNodeTransform = SpawnNode->GetSpawnTransformPin_Child();
 	UEdGraphPin* SpawnNodeCollisionHandlingOverride = GetCollisionHandlingOverridePin_Child();
 	UEdGraphPin* SpawnWorldContextPin = SpawnNode->GetWorldContextPin();
 	UEdGraphPin* SpawnClassPin = SpawnNode->GetClassPin();
 	UEdGraphPin* SpawnNodeOwnerPin = SpawnNode->GetOwnerPin_Child();
-	UEdGraphPin* SpawnNodeThen = SpawnNode->GetThenPin();
 	UEdGraphPin* SpawnNodeResult = SpawnNode->GetResultPin();
 
 	// Cache the class to spawn. Note, this is the compile time class that the pin was set to or the variable type it was connected to. Runtime it could be a child.
@@ -157,7 +186,7 @@ void UK2Node_SpawnActorDeferred::ExpandNode(class FKismetCompilerContext& Compil
 	UEdGraphPin* CallBeginTransform = CallBeginSpawnNode->FindPinChecked(TransformParamName);
 	UEdGraphPin* CallBeginCollisionHandlingOverride = CallBeginSpawnNode->FindPinChecked(CollisionHandlingOverrideParamName);
 
-	UEdGraphPin* CallBeginOwnerPin = CallBeginSpawnNode->FindPinChecked(FK2Node_SpawnActorFromClassHelper::OwnerPinName);
+	UEdGraphPin* CallBeginOwnerPin = CallBeginSpawnNode->FindPinChecked(XyahNodeHelper::OwnerPinName);
 	UEdGraphPin* CallBeginThenPin = CallBeginSpawnNode->GetThenPin();
 	UEdGraphPin* CallBeginResult = CallBeginSpawnNode->GetReturnValuePin();
 
@@ -214,8 +243,9 @@ void UK2Node_SpawnActorDeferred::ExpandNode(class FKismetCompilerContext& Compil
 	UEdGraphPin* CallFinishResult = CallFinishSpawnNode->GetReturnValuePin();
 
 	// Move 'then' connection from spawn node to 'finish spawn'
-	CompilerContext.MovePinLinksToIntermediate(*SpawnNodeThen, *CallFinishThen);
+	CompilerContext.MovePinLinksToIntermediate(*SpawnNodePostSpawn, *CallFinishThen);
 	CompilerContext.MovePinLinksToIntermediate(*SpawnNodePreSpawn, *SequencePin0);
+	CallBeginResult->PinType = SpawnNodeResult->PinType; // Copy type so it uses the right actor subclass
 	CompilerContext.MovePinLinksToIntermediate(*SpawnNodeResult, *CallBeginResult);
 
 	// Copy transform connection
@@ -252,23 +282,33 @@ UEdGraphPin* UK2Node_SpawnActorDeferred::GetPreSpawnPin() const
 	return Pin;
 }
 
+UEdGraphPin* UK2Node_SpawnActorDeferred::GetPostSpawnPin() const
+{
+	UEdGraphPin* Pin = FindPin(XyahNodeHelper::PostSpawnExec);
+	check(Pin == nullptr || Pin->Direction == EGPD_Output); // If pin exists, it must be output
+	return Pin;
+}
+
+//Copied 'as-is' from K2Node_SpawnActorFromClass
 UEdGraphPin* UK2Node_SpawnActorDeferred::GetSpawnTransformPin_Child() const
 {
-	UEdGraphPin* Pin = FindPinChecked(FK2Node_SpawnActorFromClassHelper::SpawnTransformPinName);
+	UEdGraphPin* Pin = FindPinChecked(XyahNodeHelper::SpawnTransformPinName);
 	check(Pin->Direction == EGPD_Input);
 	return Pin;
 }
 
+//Copied 'as-is' from K2Node_SpawnActorFromClass
 UEdGraphPin* UK2Node_SpawnActorDeferred::GetCollisionHandlingOverridePin_Child() const
 {
-	UEdGraphPin* const Pin = FindPinChecked(FK2Node_SpawnActorFromClassHelper::CollisionHandlingOverridePinName);
+	UEdGraphPin* const Pin = FindPinChecked(XyahNodeHelper::CollisionHandlingOverridePinName);
 	check(Pin->Direction == EGPD_Input);
 	return Pin;
 }
 
+//Copied 'as-is' from K2Node_SpawnActorFromClass
 UEdGraphPin* UK2Node_SpawnActorDeferred::GetOwnerPin_Child() const
 {
-	UEdGraphPin* Pin = FindPin(FK2Node_SpawnActorFromClassHelper::OwnerPinName);
+	UEdGraphPin* Pin = FindPin(XyahNodeHelper::OwnerPinName);
 	check(Pin == nullptr || Pin->Direction == EGPD_Input);
 	return Pin;
 }
@@ -279,7 +319,7 @@ void UK2Node_SpawnActorDeferred::MaybeUpdateCollisionPin_Child(TArray<UEdGraphPi
 	// see if there's a bNoCollisionFail pin
 	for (UEdGraphPin* Pin : OldPins)
 	{
-		if (Pin->PinName == FK2Node_SpawnActorFromClassHelper::NoCollisionFailPinName || Pin->PinName == FK2Node_SpawnActorFromClassHelper::SpawnEvenIfCollidingPinName)
+		if (Pin->PinName == XyahNodeHelper::NoCollisionFailPinName || Pin->PinName == XyahNodeHelper::SpawnEvenIfCollidingPinName)
 		{
 			bool bHadOldCollisionPin = true;
 			if (Pin->LinkedTo.Num() == 0)
