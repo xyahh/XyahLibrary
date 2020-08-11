@@ -34,6 +34,20 @@ protected:
 	static bool BP_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
 		, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName = NAME_None, UObject* FunctionOwner = nullptr);
 
+//C++ and Blueprint
+public:
+
+	//Gets the Net Local Role of a Actor or Actor Component (other UObjects will return EXyahNetRole::None)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "net role"))
+	static EXyahNetRole GetLocalRole(UObject* Object);
+
+	//Gets the Net Local Role of a Actor or Actor Component (other UObjects will return EXyahNetRole::None)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "net role"))
+	static EXyahNetRole GetRemoteRole(UObject* Object);
+
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "server standalone client listen dedicated"))
+	static EXyahNetMode GetNetMode(UObject* Object);
+
 //C++
 public:
 

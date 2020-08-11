@@ -14,6 +14,46 @@ bool UXyahActorLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
+EXyahNetRole UXyahActorLibrary::GetLocalRole(UObject* Object)
+{
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		return ConvertXyahNetRole(Actor->GetLocalRole());
+	}
+	else if (UActorComponent* ActorComponent = Cast<UActorComponent>(Object))
+	{
+		return ConvertXyahNetRole(ActorComponent->GetOwnerRole());
+	}
+	return EXyahNetRole::XNR_None;
+}
+
+EXyahNetRole UXyahActorLibrary::GetRemoteRole(UObject* Object)
+{
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		return ConvertXyahNetRole(Actor->GetRemoteRole());
+	}
+	else if (UActorComponent* ActorComponent = Cast<UActorComponent>(Object))
+	{
+		AActor* ActorOwner = ActorComponent->GetOwner();
+		return ActorOwner ? ConvertXyahNetRole(ActorOwner->GetLocalRole()) : EXyahNetRole::XNR_None;
+	}
+	return EXyahNetRole::XNR_None;
+}
+
+EXyahNetMode UXyahActorLibrary::GetNetMode(UObject* Object)
+{
+	if (AActor* Actor = Cast<AActor>(Object))
+	{
+		return ConvertXyahNetMode(Actor->GetNetMode());
+	}
+	else if (UActorComponent* ActorComponent = Cast<UActorComponent>(Object))
+	{
+		return ConvertXyahNetMode(ActorComponent->GetNetMode());
+	}
+	return EXyahNetMode::XNM_MAX;
+}
+
 bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)
 {

@@ -27,6 +27,16 @@ void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, 
 	OutSettings = GetMutableDefault<UXyahSettings>(SettingsClass);
 }
 
+void UXyahUtilityLibrary::StatFPS(float& FPS, float& Milliseconds)
+{
+#if WITH_ENGINE
+	extern ENGINE_API float GAverageFPS;
+	extern ENGINE_API float GAverageMS;
+	FPS = GAverageFPS;
+	Milliseconds = GAverageMS;
+#endif
+}
+
 //Blueprint & C++
 void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrintSettings& Settings)
 {

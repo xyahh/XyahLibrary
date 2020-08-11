@@ -54,6 +54,10 @@ protected:
 //Blueprints & C++ 
 public:
 
+	//Returns the FPS and the Milliseconds shown in Stat FPS.
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (Keywords = "FPS performance frame framerate"))
+	static void StatFPS(float& FPS, float & Milliseconds);
+
 	/* 
 	Prints a String to either the Screen, Log, or both. 
 	@param InString - The String to Print

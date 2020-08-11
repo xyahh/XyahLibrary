@@ -22,3 +22,13 @@ uint64 ConvertXyahPropertyFlags(int32 XyahPropertyFlags)
 
 	return OutPropertyFlags;
 }
+
+EXyahNetRole ConvertXyahNetRole(ENetRole Role)
+{
+	return static_cast<EXyahNetRole>(Role);
+}
+
+EXyahNetMode ConvertXyahNetMode(ENetMode Mode)
+{
+	return static_cast<EXyahNetMode>(Mode);
+}
