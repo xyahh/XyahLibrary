@@ -291,12 +291,6 @@ bool UXyahUtilityLibrary::Generic_FromString(const FString& InString, FProperty*
 	return false;
 }
 
-template<typename FPropertyUType>
-FString GetPropertyTypeName_Checked(FPropertyUType* Property)
-{
-	return Property->PropertyClass->GetName();
-}
-
 void UXyahUtilityLibrary::Generic_GetWildcardType(FProperty* Property, FString& Name, FString& Type)
 {
 #define GetPropertyTypeName(PropertyType, Prefix) { if(PropertyType* Prop = CastField<PropertyType>(Property)) { Name = Prop->PropertyClass->GetName(); Type = Prefix; return; } }
