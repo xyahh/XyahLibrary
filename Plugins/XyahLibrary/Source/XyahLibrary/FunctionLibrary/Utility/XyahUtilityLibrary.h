@@ -19,6 +19,7 @@ class XYAHLIBRARY_API UXyahUtilityLibrary : public UBlueprintFunctionLibrary
 //Blueprints Only
 protected:
 
+	/* Gets the given Wildcard's Name and Type (e.g. Transform & Struct, respectively) */
 	UFUNCTION(BlueprintPure, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "Wildcard"))
 	static void GetWildcard(int32 Wildcard, FString& Name, FString& Type);
 
