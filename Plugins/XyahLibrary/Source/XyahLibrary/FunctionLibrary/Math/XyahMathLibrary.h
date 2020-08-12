@@ -17,7 +17,6 @@ class XYAHLIBRARY_API UXyahMathLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	//Converts a given Integer Number to a String expressing the Number in Binary Form
 	/*
 	Converts a given Integer Number to a String expressing it in Binary Form
 	@param Number - the Decimal Number to convert to Binary
@@ -25,6 +24,71 @@ public:
 	*/
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math")
 	static FString ToBinaryString(int32 Number, bool bIncludeLeftZeros);
+
+/* OPERATOR ADD ASSIGN  */
+	
+	//Increases the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Add Assign Integer", CompactNodeTitle = "+=", Keywords = "sum increase"))
+	static int32 AddAssign_Integer(UPARAM(Ref) int32& Ref, int32 Amount);
+	
+	//Increases the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Float", meta = (DisplayName = "Add Assign Float", CompactNodeTitle = "+=", Keywords = "sum increase"))
+	static float AddAssign_Float(UPARAM(Ref) float& Ref, float Amount);
+
+	//Increases the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Add Assign Vector", CompactNodeTitle = "+=", Keywords = "sum increase"))
+	static FVector AddAssign_Vector(UPARAM(Ref) FVector& Ref, const FVector& Amount, bool bNormalize);
+
+	//Increases the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Rotator", meta = (DisplayName = "Add Assign Rotator", CompactNodeTitle = "+=", Keywords = "sum increase"))
+	static FRotator AddAssign_Rotator(UPARAM(Ref) FRotator& Ref, const FRotator& Amount, bool bNormalize);
+
+/* OPERATOR SUBTRACT ASSIGN  */
+
+	//Decreases the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Subtract Assign Integer", CompactNodeTitle = "-=", Keywords = "minus decrease"))
+	static int32 SubtractAssign_Integer(UPARAM(Ref) int32& Ref, int32 Amount);
+	
+	//Decreases the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Float", meta = (DisplayName = "Subtract Assign Float", CompactNodeTitle = "-=", Keywords = "minus decrease"))
+	static float SubtractAssign_Float(UPARAM(Ref) float& Ref, float Amount);
+
+	//Decreases the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Subtract Assign Vector", CompactNodeTitle = "-=", Keywords = "minus decrease"))
+	static FVector SubtractAssign_Vector(UPARAM(Ref) FVector& Ref, const FVector& Amount, bool bNormalize);
+
+	//Decreases the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Rotator", meta = (DisplayName = "Subtract Assign Rotator", CompactNodeTitle = "-=", Keywords = "minus decrease"))
+	static FRotator SubtractAssign_Rotator(UPARAM(Ref) FRotator& Ref, const FRotator& Amount, bool bNormalize);
+
+/* OPERATOR MULTIPLY ASSIGN */
+	
+	//Multiples the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Multiply Assign Integer", CompactNodeTitle = "*=", Keywords = "times"))
+	static int32 MultiplyAssign_Integer(UPARAM(Ref) int32& Ref, int32 Amount);
+	
+	//Multiples the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Float", meta = (DisplayName = "Multiply Assign Float", CompactNodeTitle = "*=", Keywords = "times"))
+	static float MultiplyAssign_Float(UPARAM(Ref) float& Ref, float Amount);
+
+	//Multiples the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Multiply Assign Vector", CompactNodeTitle = "*=", Keywords = "times"))
+	static FVector MultiplyAssign_Vector(UPARAM(Ref) FVector& Ref, const FVector& Amount, bool bNormalize);
+
+/* OPERATOR DIVIDE ASSIGN */
+
+	//Multiples the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Integer", meta = (DisplayName = "Divide Assign Integer", CompactNodeTitle = "/="))
+	static int32 DivideAssign_Integer(UPARAM(Ref) int32& Ref, int32 Amount);
+	
+	//Multiples the given Number (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Float", meta = (DisplayName = "Divide Assign Float", CompactNodeTitle = "/="))
+	static float DivideAssign_Float(UPARAM(Ref) float& Ref, float Amount);
+
+	//Multiples the given Vector (passed by ref) by the given amount 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Math|Vector", meta = (DisplayName = "Divide Assign Vector", CompactNodeTitle = "/="))
+	static FVector DivideAssign_Vector(UPARAM(Ref) FVector& Ref, const FVector& Amount, bool bNormalize);
+
 
 /* SUM */
 

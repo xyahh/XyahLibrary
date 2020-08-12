@@ -19,6 +19,9 @@ class XYAHLIBRARY_API UXyahUtilityLibrary : public UBlueprintFunctionLibrary
 //Blueprints Only
 protected:
 
+	UFUNCTION(BlueprintPure, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "Wildcard"))
+	static void GetWildcard(int32 Wildcard, FString& Name, FString& Type);
+
 	/*
 	Returns the Input as a String in the Simple Object Text Format.
 
@@ -98,6 +101,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue);
 
+
 //Blueprint/C++ Internal Funcs
 protected:
 
@@ -124,38 +128,14 @@ public:
 
 	static bool Generic_ToString(FProperty* Property, void* Data, FString& OutString);
 	static bool Generic_FromString(const FString& InString, FProperty* Property, void* Data);
+	static void Generic_GetWildcardType(FProperty* Property, FString& Name, FString& Type);
 
 //Exec Funcs
 public:
 
-	DECLARE_FUNCTION(execToString)
-	{
-		Stack.Step(Stack.Object, NULL);
-		FProperty* InProperty = Stack.MostRecentProperty;
-		void* Data = Stack.MostRecentPropertyAddress;
-
-		PARAM_PASSED_BY_REF(OutString, FStrProperty, FString);
-
-		P_FINISH;
-		P_NATIVE_BEGIN;
-		XYAH_RETURN(bool, Generic_ToString(InProperty, Data, OutString));
-		P_NATIVE_END;
-	}
-
-	DECLARE_FUNCTION(execFromString)
-	{
-		P_GET_PROPERTY(FStrProperty, InString);
-
-		Stack.Step(Stack.Object, NULL);
-		FProperty* RefProperty = Stack.MostRecentProperty;
-		void* Data = Stack.MostRecentPropertyAddress;
-		P_FINISH;
-
-		P_NATIVE_BEGIN;
-		XYAH_MARK_PROPERTY_DIRTY(RefProperty);
-		XYAH_RETURN(bool, Generic_FromString(InString, RefProperty, Data));
-		P_NATIVE_END;
-	}
+	DECLARE_FUNCTION(execGetWildcard);
+	DECLARE_FUNCTION(execToString);
+	DECLARE_FUNCTION(execFromString);
 };
 
 

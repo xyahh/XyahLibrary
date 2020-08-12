@@ -6,6 +6,11 @@
 
 // Blueprint ONLY
 
+void UXyahUtilityLibrary::GetWildcard(int32 Wildcard, FString& Name, FString& Type)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS();
+}
+
 bool UXyahUtilityLibrary::ToString(int32 InValue, FString& OutString)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
@@ -284,4 +289,32 @@ bool UXyahUtilityLibrary::Generic_FromString(const FString& InString, FProperty*
 		return !!Property->ImportText(*InString, Data, 0, 0);
 	}
 	return false;
+}
+
+template<typename FPropertyUType>
+FString GetPropertyTypeName_Checked(FPropertyUType* Property)
+{
+	return Property->PropertyClass->GetName();
+}
+
+void UXyahUtilityLibrary::Generic_GetWildcardType(FProperty* Property, FString& Name, FString& Type)
+{
+#define GetPropertyTypeName(PropertyType, Prefix) { if(PropertyType* Prop = CastField<PropertyType>(Property)) { Name = Prop->PropertyClass->GetName(); Type = Prefix; return; } }
+
+	if (FStructProperty* StructProperty = CastField<FStructProperty>(Property))
+	{
+		Name = StructProperty->Struct->GetAuthoredName();
+		Type = TEXT("Struct");
+		return;
+	}
+
+	GetPropertyTypeName(FObjectProperty, TEXT("Object"));
+	GetPropertyTypeName(FClassProperty, TEXT("Class"));
+	GetPropertyTypeName(FSoftObjectProperty, TEXT("SoftObject"));
+	GetPropertyTypeName(FSoftClassProperty, TEXT("SoftClass"));
+
+	if (Property)
+	{
+		Name = Type = Property->GetCPPType();
+	}		
 }

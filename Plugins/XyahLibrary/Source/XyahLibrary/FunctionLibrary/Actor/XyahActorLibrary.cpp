@@ -54,6 +54,17 @@ EXyahNetMode UXyahActorLibrary::GetNetMode(UObject* Object)
 	return EXyahNetMode::XNM_MAX;
 }
 
+#include "GameFramework/PlayerController.h"
+void UXyahActorLibrary::ForceAddCheats(class APlayerController* PC)
+{
+#if !UE_BUILD_SHIPPING
+	if (IsValid(PC))
+	{
+		PC->AddCheats(true);
+	}
+#endif
+}
+
 bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)
 {

@@ -25,6 +25,105 @@ FString UXyahMathLibrary::ToBinaryString(int32 Number, bool bIncludeLeftZeros)
 	return OutString;
 }
 
+int32 UXyahMathLibrary::AddAssign_Integer(int32& Ref, int32 Amount)
+{
+	Ref += Amount;
+	return Ref;
+}
+
+float UXyahMathLibrary::AddAssign_Float(float& Ref, float Amount)
+{
+	Ref += Amount;
+	return Ref;
+}
+
+FVector UXyahMathLibrary::AddAssign_Vector(FVector& Ref, const FVector& Amount, bool bNormalize)
+{
+	Ref += Amount;
+	if(bNormalize)
+		Ref.Normalize();
+	return Ref;
+}
+
+FRotator UXyahMathLibrary::AddAssign_Rotator(FRotator& Ref, const FRotator& Amount, bool bNormalize)
+{
+	Ref += Amount;
+	if (bNormalize)
+		Ref.Normalize();
+	return Ref;
+}
+
+int32 UXyahMathLibrary::SubtractAssign_Integer(int32& Ref, int32 Amount)
+{
+	return AddAssign_Integer(Ref, -1 * Amount);
+}
+
+float UXyahMathLibrary::SubtractAssign_Float(float& Ref, float Amount)
+{
+	return AddAssign_Float(Ref, -1.f * Amount);
+}
+
+FVector UXyahMathLibrary::SubtractAssign_Vector(FVector& Ref, const FVector& Amount, bool bNormalize)
+{
+	return AddAssign_Vector(Ref, -1.f * Amount, bNormalize);
+}
+
+FRotator UXyahMathLibrary::SubtractAssign_Rotator(FRotator& Ref, const FRotator& Amount, bool bNormalize)
+{
+	return AddAssign_Rotator(Ref, -1.f * Amount, bNormalize);
+}
+
+int32 UXyahMathLibrary::MultiplyAssign_Integer(int32& Ref, int32 Amount)
+{
+	Ref *= Amount;
+	return Ref;
+}
+
+float UXyahMathLibrary::MultiplyAssign_Float(float& Ref, float Amount)
+{
+	Ref *= Amount;
+	return Ref;
+}
+
+FVector UXyahMathLibrary::MultiplyAssign_Vector(FVector& Ref, const FVector& Amount, bool bNormalize)
+{
+	Ref *= Amount;
+	if(bNormalize)
+		Ref.Normalize();
+	return Ref;
+}
+
+int32 UXyahMathLibrary::DivideAssign_Integer(int32& Ref, int32 Amount)
+{
+	if(Amount != 0)
+		Ref /= Amount;
+	else
+		XYAH_LIB_LOG(Warning, TEXT("Attempting to divide %d by zero!"), Ref);
+	return Ref;
+}
+
+float UXyahMathLibrary::DivideAssign_Float(float& Ref, float Amount)
+{
+	if (FMath::Abs(Amount) > SMALL_NUMBER)
+		Ref /= Amount;
+	else
+	{
+		XYAH_LIB_LOG(Warning, TEXT("Attempting to divide %f by zero or a really small number!"), Ref);
+	}
+	return Ref;
+}
+
+FVector UXyahMathLibrary::DivideAssign_Vector(FVector& Ref, const FVector& Amount, bool bNormalize)
+{
+	if (FMath::Abs(Amount.X) > SMALL_NUMBER && FMath::Abs(Amount.Y) > SMALL_NUMBER && FMath::Abs(Amount.Z) > SMALL_NUMBER)
+		Ref /= Amount;
+	else
+	{
+		XYAH_LIB_LOG(Warning, TEXT("Attempting to divide %s by zero or a really small number!"), *Ref.ToString());
+	}
+	return Ref;
+}
+
 int32 UXyahMathLibrary::GetSum_Integer(const TArray<int32>& InArray)
 {
 	int32 Sum = 0;
