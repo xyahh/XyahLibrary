@@ -20,7 +20,10 @@ public class XyahLibrary : ModuleRules
 				"XyahLibrary",
 				"XyahLibrary/FunctionLibrary",
                 "XyahLibrary/FunctionLibrary/Core",
-				"XyahLibrary/Settings",
+                "XyahLibrary/Graph",
+                "XyahLibrary/Components",
+				"XyahLibrary/Components/Core",
+                "XyahLibrary/Settings",
 				// ... add other private include paths required here ...
 			}
 			);
