@@ -47,11 +47,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "net role authority proxy simulated autonomous"))
 	static EXyahNetRole GetRemoteRole(UObject* Object);
 
+	//Gets the Net mode of the Actor or Actor Component (other UObjects will return EXyahNetMode::MAX)
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "server standalone client listen dedicated"))
 	static EXyahNetMode GetNetMode(UObject* Object);
 
 	//Forces the Addition of Cheats on Non-Shipping Builds. It doesn't do anything in Shipping Builds
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor")
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Game")
 	static void ForceAddCheats(class APlayerController* PC);
 
 	/*
@@ -63,7 +64,7 @@ public:
 	@param OnLevelLoadingComplete - called once the loading has finished.
 	@see FinishLoadingLevel
 	*/
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (Keywords = "open load world stream"))
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Game", meta = (Keywords = "open load world stream"))
 	static bool StartLoadingLevel(const FString& Level, int32 LoadingPriority, FOnLevelLoadingComplete OnLevelLoadingComplete);
 
 
@@ -72,7 +73,7 @@ public:
 	@param LevelPackage - The package object gotten from "StartLoadingLevel"
 	@see StartLoadingLevel
 	*/
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (WorldContext = "WorldContextObject", Keywords = "open load world stream"))
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Game", meta = (WorldContext = "WorldContextObject", Keywords = "open load world stream"))
 	static void FinishLoadingLevel(UObject* WorldContextObject, UObject* LevelPackage, bool bAbsolute, const FString& Options);
 
 //C++

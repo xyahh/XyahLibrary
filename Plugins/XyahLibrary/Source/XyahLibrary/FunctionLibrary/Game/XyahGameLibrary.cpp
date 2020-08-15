@@ -83,7 +83,7 @@ bool UXyahGameLibrary::StartLoadingLevel(const FString& Level
 	{
 		WantedMapPath = FPackageName::FilenameToLongPackageName(*FoundMapPathPtr);
 		LoadPackageAsync(WantedMapPath
-			, FLoadPackageAsyncDelegate::CreateLambda(
+			, FLoadPackageAsyncDelegate::CreateLambda( //TODO: Check thread safety
 				[OnLevelLoadingComplete, WantedMapPath](const FName& PackageName, UPackage* LoadedPackage
 					, EAsyncLoadingResult::Type Result)
 		{
