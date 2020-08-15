@@ -131,6 +131,33 @@ bool UXyahUtilityLibrary::GetPropertyValue(UObject* OwnerObject, const FString& 
 	return false;
 }
 
+TArray<FString> UXyahUtilityLibrary::GetAllFilesInDirectory(const FString& Directory
+	, TEnumAsByte<EXyahDirectoryType> DirectoryType, const FString& FileExtension, bool bRecursiveSearch)
+{
+	FString DirectoryToSearch;
+	switch (DirectoryType)
+	{
+	case EXyahDirectoryType::XDT_Absolute: 
+		DirectoryToSearch = Directory; break;
+	case EXyahDirectoryType::XDT_Game: 
+		DirectoryToSearch = FPaths::ProjectDir() + Directory; break;
+	case EXyahDirectoryType::XDT_Saved: 
+		DirectoryToSearch = FPaths::ProjectSavedDir() + Directory; break;
+	}
+		
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+	TArray<FString> FoundFiles;
+	if (bRecursiveSearch)
+	{
+		PlatformFile.FindFilesRecursively(FoundFiles, *DirectoryToSearch, *FileExtension);
+	}
+	else
+	{
+		PlatformFile.FindFiles(FoundFiles, *DirectoryToSearch, *FileExtension);
+	}
+	return FoundFiles;
+}
+
 bool UXyahUtilityLibrary::GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue)
 {
 	OutPropertyValue.Empty();

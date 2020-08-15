@@ -102,6 +102,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
 	static bool GetPropertyValue(UObject* OwnerObject, const FString& PropertyName, FString& OutPropertyValue);
 
+	/*
+	Gets all the Files (Recursively or non-recursively) of a certain extension in a Given Directory.
+	@param SearchDirectory - The directory to search these files
+	@param DirectoryType - Whether this is an absolute directory or a relative one
+	@param FileExtension - The file extension to look for
+	@return A string array of the names of the files found.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility")
+	static TArray<FString> GetAllFilesInDirectory(const FString& SearchDirectory
+		, TEnumAsByte<EXyahDirectoryType> DirectoryType, const FString& FileExtension
+		, bool bRecursiveSearch);
+
 
 //Blueprint/C++ Internal Funcs
 protected:

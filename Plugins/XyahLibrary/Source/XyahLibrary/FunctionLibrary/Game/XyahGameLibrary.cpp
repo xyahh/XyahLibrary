@@ -1,20 +1,20 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 
-#include "XyahActorLibrary.h"
+#include "XyahGameLibrary.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Utility/XyahUtilityLibrary.h"
 
-bool UXyahActorLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
+bool UXyahGameLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , TArray<AActor*>& OutActors, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName /*= NAME_None*/
 , UObject* FunctionOwner /*= nullptr*/)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
-EXyahNetRole UXyahActorLibrary::GetLocalRole(UObject* Object)
+EXyahNetRole UXyahGameLibrary::GetLocalRole(UObject* Object)
 {
 	if (AActor* Actor = Cast<AActor>(Object))
 	{
@@ -27,7 +27,7 @@ EXyahNetRole UXyahActorLibrary::GetLocalRole(UObject* Object)
 	return EXyahNetRole::XNR_None;
 }
 
-EXyahNetRole UXyahActorLibrary::GetRemoteRole(UObject* Object)
+EXyahNetRole UXyahGameLibrary::GetRemoteRole(UObject* Object)
 {
 	if (AActor* Actor = Cast<AActor>(Object))
 	{
@@ -41,7 +41,7 @@ EXyahNetRole UXyahActorLibrary::GetRemoteRole(UObject* Object)
 	return EXyahNetRole::XNR_None;
 }
 
-EXyahNetMode UXyahActorLibrary::GetNetMode(UObject* Object)
+EXyahNetMode UXyahGameLibrary::GetNetMode(UObject* Object)
 {
 	if (AActor* Actor = Cast<AActor>(Object))
 	{
@@ -55,7 +55,7 @@ EXyahNetMode UXyahActorLibrary::GetNetMode(UObject* Object)
 }
 
 #include "GameFramework/PlayerController.h"
-void UXyahActorLibrary::ForceAddCheats(class APlayerController* PC)
+void UXyahGameLibrary::ForceAddCheats(class APlayerController* PC)
 {
 #if !UE_BUILD_SHIPPING
 	if (IsValid(PC))
@@ -65,7 +65,54 @@ void UXyahActorLibrary::ForceAddCheats(class APlayerController* PC)
 #endif
 }
 
-bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
+#include "Kismet/GameplayStatics.h"
+#include "UObject/UObjectGlobals.h"
+bool UXyahGameLibrary::LoadLevel(const UObject* WorldContextObject, const FString& Level, bool bAbsolute
+	, const FString& Options, FOnLevelLoadingComplete OnLevelLoadComplete)
+{
+	FString WantedMapPath = Level;
+	if(!Level.EndsWith(TEXT(".umap")))
+		WantedMapPath += TEXT(".umap");
+
+	TArray<FString> FoundMapPaths = XYAH(Utility) GetAllFilesInDirectory(TEXT("Content"), EXyahDirectoryType::XDT_Game, TEXT(".umap"), true);
+	FString* FoundMapPathPtr = FoundMapPaths.FindByPredicate([&WantedMapPath](const FString& MapPath)
+	{
+		return MapPath.EndsWith(WantedMapPath);
+	});
+
+	if (FoundMapPathPtr)
+	{
+		WantedMapPath = FPackageName::FilenameToLongPackageName(*FoundMapPathPtr);
+		LoadPackageAsync(WantedMapPath
+			, FLoadPackageAsyncDelegate::CreateLambda(
+				[OnLevelLoadComplete, WantedMapPath, WorldContextObject](const FName& PackageName, UPackage* LoadedPackage
+					, EAsyncLoadingResult::Type Result)
+				{
+					OnLevelLoadComplete.ExecuteIfBound(Result == EAsyncLoadingResult::Succeeded);
+
+					switch (Result)
+					{
+						case EAsyncLoadingResult::Failed:
+							XYAH_LIB_LOG(Warning, TEXT("Level Loading Failed! (%s)"), *WantedMapPath);
+							break;
+
+						case EAsyncLoadingResult::Succeeded:
+							XYAH_LIB_LOG(Log, TEXT("Level Loading Success! (%s)"), *WantedMapPath);
+							UGameplayStatics::OpenLevel(GEngine->GetWorldFromContextObject(WorldContextObject
+								, EGetWorldErrorMode::LogAndReturnNull), *WantedMapPath);
+							break;
+
+						case EAsyncLoadingResult::Canceled:
+							XYAH_LIB_LOG(Log, TEXT("Level Loading was Cancelled! (%s)"), *WantedMapPath);
+							break;
+					}					
+				}), 0, PKG_ContainsMap);
+		return true;
+	}
+	return false;
+}
+
+bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)
 {
 	OutActors.Empty();
@@ -82,7 +129,7 @@ bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, T
 	return false;
 }
 
-void UXyahActorLibrary::Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, FProperty* ArrayInnerProperty
+void UXyahGameLibrary::Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, FProperty* ArrayInnerProperty
 	, TArray<AActor*>& OutActors, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName, UObject* FuncOwner)
 {
 	OutActors.Empty();

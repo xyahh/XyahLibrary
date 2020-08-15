@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "XyahLibraryCore.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "XyahActorLibrary.generated.h"
+#include "XyahGameLibrary.generated.h"
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnLevelLoadingComplete, bool, bSucceeded);
 
 /**
  * 
  */
 UCLASS()
-class XYAHLIBRARY_API UXyahActorLibrary : public UBlueprintFunctionLibrary
+class XYAHLIBRARY_API UXyahGameLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -52,6 +54,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor")
 	static void ForceAddCheats(class APlayerController* PC);
 
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (WorldContext = "WorldContextObject"))
+	static bool LoadLevel(const UObject* WorldContextObject, const FString& Level, bool bAbsolute, const FString& Options
+		, FOnLevelLoadingComplete OnLevelLoadComplete);
+
 //C++
 public:
 
@@ -75,9 +81,10 @@ public:
 public:
 
 	DECLARE_FUNCTION(execBP_GetAllActorsOfClass);
+
 };
 
 
-#if XYAH_ACTOR_LIBRARY
-#include "XyahActorLibrary.inl"
+#if XYAH_GAME_LIBRARY
+#include "XyahGameLibrary.inl"
 #endif

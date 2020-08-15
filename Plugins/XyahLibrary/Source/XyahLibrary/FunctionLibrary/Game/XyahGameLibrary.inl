@@ -2,7 +2,7 @@
 
 #pragma once
 
-FORCEINLINE DEFINE_FUNCTION(UXyahActorLibrary::execBP_GetAllActorsOfClass)
+FORCEINLINE DEFINE_FUNCTION(UXyahGameLibrary::execBP_GetAllActorsOfClass)
 {
 	P_GET_OBJECT(UObject, WorldContextObject);
 	P_GET_OBJECT(UClass, ActorClass);
@@ -22,7 +22,7 @@ FORCEINLINE DEFINE_FUNCTION(UXyahActorLibrary::execBP_GetAllActorsOfClass)
 }
 
 template<typename FilterPredicate>
-bool UXyahActorLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
+bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors, FilterPredicate FilterPred)
 {
 	OutActors.Empty();

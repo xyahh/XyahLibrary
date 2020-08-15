@@ -14,7 +14,7 @@ DECLARE_LOG_CATEGORY_EXTERN(XyahLibLog, Log, All);
 #define XYAH_UTILITY_LIBRARY	1
 #define XYAH_MATH_LIBRARY		1
 #define XYAH_ARRAY_LIBRARY		1
-#define XYAH_ACTOR_LIBRARY		1
+#define XYAH_GAME_LIBRARY		1
 #define XYAH_MAP_LIBRARY		1
 
 
@@ -62,6 +62,14 @@ enum EXyahNetMode
 	XNM_ListenServer UMETA(DisplayName = "Listen Server", ToolTip = "Server that also has a local player who is hosting the game, available to other players on the network."),
 	XNM_Client UMETA(DisplayName = "Client", ToolTip = "Client connected to a remote server"),
 	XNM_MAX,
+};
+
+UENUM(BlueprintType)
+enum EXyahDirectoryType
+{
+	XDT_Absolute UMETA(DisplayName = "Absolute", ToolTip = "The absolute location of the directory."),
+	XDT_Game UMETA(DisplayName = "Game", ToolTip = "The path relative to the Game (Project) directory."),
+	XDT_Saved UMETA(DisplayName = "Saved", ToolTip = "The path relative to the Saved directory."),
 };
 
 
