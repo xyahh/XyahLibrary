@@ -65,13 +65,12 @@ void UXyahGameLibrary::ForceAddCheats(class APlayerController* PC)
 #endif
 }
 
-#include "Kismet/GameplayStatics.h"
 #include "UObject/UObjectGlobals.h"
-bool UXyahGameLibrary::LoadLevel(const UObject* WorldContextObject, const FString& Level, bool bAbsolute
-	, const FString& Options, FOnLevelLoadingComplete OnLevelLoadComplete)
+bool UXyahGameLibrary::StartLoadingLevel(const FString& Level
+	, int32 LoadingPriority, FOnLevelLoadingComplete OnLevelLoadingComplete)
 {
 	FString WantedMapPath = Level;
-	if(!Level.EndsWith(TEXT(".umap")))
+	if (!Level.EndsWith(TEXT(".umap")))
 		WantedMapPath += TEXT(".umap");
 
 	TArray<FString> FoundMapPaths = XYAH(Utility) GetAllFilesInDirectory(TEXT("Content"), EXyahDirectoryType::XDT_Game, TEXT(".umap"), true);
@@ -85,32 +84,40 @@ bool UXyahGameLibrary::LoadLevel(const UObject* WorldContextObject, const FStrin
 		WantedMapPath = FPackageName::FilenameToLongPackageName(*FoundMapPathPtr);
 		LoadPackageAsync(WantedMapPath
 			, FLoadPackageAsyncDelegate::CreateLambda(
-				[OnLevelLoadComplete, WantedMapPath, WorldContextObject](const FName& PackageName, UPackage* LoadedPackage
+				[OnLevelLoadingComplete, WantedMapPath](const FName& PackageName, UPackage* LoadedPackage
 					, EAsyncLoadingResult::Type Result)
-				{
-					OnLevelLoadComplete.ExecuteIfBound(Result == EAsyncLoadingResult::Succeeded);
+		{
+			OnLevelLoadingComplete.ExecuteIfBound(LoadedPackage, Result == EAsyncLoadingResult::Succeeded);
 
-					switch (Result)
-					{
-						case EAsyncLoadingResult::Failed:
-							XYAH_LIB_LOG(Warning, TEXT("Level Loading Failed! (%s)"), *WantedMapPath);
-							break;
+			switch (Result)
+			{
+			case EAsyncLoadingResult::Failed:
+				XYAH_LIB_LOG(Warning, TEXT("Level Loading Failed! (%s)"), *WantedMapPath);
+				break;
 
-						case EAsyncLoadingResult::Succeeded:
-							XYAH_LIB_LOG(Log, TEXT("Level Loading Success! (%s)"), *WantedMapPath);
-							UGameplayStatics::OpenLevel(GEngine->GetWorldFromContextObject(WorldContextObject
-								, EGetWorldErrorMode::LogAndReturnNull), *WantedMapPath);
-							break;
+			case EAsyncLoadingResult::Succeeded:
+				XYAH_LIB_LOG(Log, TEXT("Level Loading Success! (%s)"), *WantedMapPath);
+				break;
 
-						case EAsyncLoadingResult::Canceled:
-							XYAH_LIB_LOG(Log, TEXT("Level Loading was Cancelled! (%s)"), *WantedMapPath);
-							break;
-					}					
-				}), 0, PKG_ContainsMap);
+			case EAsyncLoadingResult::Canceled:
+				XYAH_LIB_LOG(Log, TEXT("Level Loading was Cancelled! (%s)"), *WantedMapPath);
+				break;
+			}
+		}), LoadingPriority, PKG_ContainsMap);
 		return true;
 	}
 	return false;
 }
+
+#include "Kismet/GameplayStatics.h"
+void UXyahGameLibrary::FinishLoadingLevel(UObject* WorldContextObject
+	, UObject* LevelPackage, bool bAbsolute, const FString& Options)
+{
+	if (IsValid(LevelPackage))
+		UGameplayStatics::OpenLevel(WorldContextObject, LevelPackage->GetFName(), bAbsolute, Options);
+}
+
+
 
 bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)

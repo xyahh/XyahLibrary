@@ -7,7 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahGameLibrary.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnLevelLoadingComplete, bool, bSucceeded);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnLevelLoadingComplete, UObject*, LevelPackage, bool, bSucceeded);
 
 /**
  * 
@@ -54,9 +54,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor")
 	static void ForceAddCheats(class APlayerController* PC);
 
-	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (WorldContext = "WorldContextObject"))
-	static bool LoadLevel(const UObject* WorldContextObject, const FString& Level, bool bAbsolute, const FString& Options
-		, FOnLevelLoadingComplete OnLevelLoadComplete);
+	/*
+	Loads the Level in the Background (ASYNC) and calls "OnLevelLoadingComplete" once this process has been completed.
+	Once you have the package gotten from "OnLevelLoadingComplete", call "FinishLoadingLevel" to actually open the level.
+
+	@param Level - The Level to Load
+	@param LoadingPriority - The loading priority. The higher number the higher priority. 
+	@param OnLevelLoadingComplete - called once the loading has finished.
+	@see FinishLoadingLevel
+	*/
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (Keywords = "open load world stream"))
+	static bool StartLoadingLevel(const FString& Level, int32 LoadingPriority, FOnLevelLoadingComplete OnLevelLoadingComplete);
+
+
+	/*
+	Opens the Level Loaded via Async from "StartLoadingLevel"
+	@param LevelPackage - The package object gotten from "StartLoadingLevel"
+	@see StartLoadingLevel
+	*/
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (WorldContext = "WorldContextObject", Keywords = "open load world stream"))
+	static void FinishLoadingLevel(UObject* WorldContextObject, UObject* LevelPackage, bool bAbsolute, const FString& Options);
 
 //C++
 public:
