@@ -18,7 +18,7 @@ class XYAHLIBRARY_API UXyahArrayLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 //Blueprint Only
-protected:
+private:
 
 	/*
 	Gets a Random Element from the Array
@@ -119,7 +119,7 @@ public:
 	static bool AllIf(const TArray<ArrayElement>& InArray, Predicate Pred);
 
 //Internal Funcs 
-protected:
+private:
 
 	static void Generic_GetRandom(void* TargetArray, const FArrayProperty* ArrayProp, void* OutItem);
 

@@ -89,7 +89,7 @@ void UXyahUtilityLibrary::GetProperties(UObject* OwnerObject, const TSet<TSubcla
 			|| (static_cast<uint64>(PropertyIter->GetPropertyFlags()) & ConvertXyahPropertyFlags(PropertyFlags)))
 			{
 				FString PropertyValue;
-				GetPropertyValue_Internal(OwnerObject, *PropertyIter, PropertyValue);
+				GetPropertyValueString(OwnerObject, *PropertyIter, PropertyValue);
 				OutProperties.Add(PropertyIter->GetName(), PropertyValue);
 			}
 		}
@@ -124,7 +124,7 @@ bool UXyahUtilityLibrary::GetPropertyValue(UObject* OwnerObject, const FString& 
 {
 	if (IsValid(OwnerObject) && !PropertyName.IsEmpty())
 	{
-		return GetPropertyValue_Internal(OwnerObject
+		return GetPropertyValueString(OwnerObject
 		, FindFProperty<FProperty>(OwnerObject->GetClass(), *PropertyName)
 		, OutPropertyValue);
 	}
@@ -158,7 +158,7 @@ TArray<FString> UXyahUtilityLibrary::GetAllFilesInDirectory(const FString& Direc
 	return FoundFiles;
 }
 
-bool UXyahUtilityLibrary::GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue)
+bool UXyahUtilityLibrary::GetPropertyValueString(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue)
 {
 	OutPropertyValue.Empty();
 	if (Property)
@@ -302,6 +302,7 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 
 bool UXyahUtilityLibrary::Generic_ToString(FProperty* Property, void* Data, FString& OutString)
 {
+	OutString.Empty();
 	if (Property && Data)
 	{
 		return Property->ExportText_Direct(OutString, Data, Data, 0, PPF_SimpleObjectText);
@@ -320,6 +321,9 @@ bool UXyahUtilityLibrary::Generic_FromString(const FString& InString, FProperty*
 
 void UXyahUtilityLibrary::Generic_GetWildcardType(FProperty* Property, FString& Name, FString& Type)
 {
+	Name.Empty();
+	Type.Empty();
+	
 #define GetPropertyTypeName(PropertyType, Prefix) { if(PropertyType* Prop = CastField<PropertyType>(Property)) { Name = Prop->PropertyClass->GetName(); Type = Prefix; return; } }
 
 	if (FStructProperty* StructProperty = CastField<FStructProperty>(Property))

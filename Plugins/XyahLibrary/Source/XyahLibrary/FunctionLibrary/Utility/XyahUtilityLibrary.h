@@ -17,7 +17,7 @@ class XYAHLIBRARY_API UXyahUtilityLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 //Blueprints Only
-protected:
+private:
 
 	/* Gets the given Wildcard's Name and Type (e.g. Transform & Struct, respectively) */
 	UFUNCTION(BlueprintPure, CustomThunk, Category = "XyahLibrary|Utility", meta = (CustomStructureParam = "Wildcard"))
@@ -114,14 +114,11 @@ public:
 		, TEnumAsByte<EXyahDirectoryType> DirectoryType, const FString& FileExtension
 		, bool bRecursiveSearch);
 
-
-//Blueprint/C++ Internal Funcs
-protected:
-
-	static bool GetPropertyValue_Internal(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue);
-
 //C++ Only
 public:
+
+	//Gets the Value of the given FProperty as String (in Simple Object Text Format)
+	static bool GetPropertyValueString(UObject* OwnerObject, FProperty* Property, FString& OutPropertyValue);
 
 	//Checks whether two properties are of the same class, type, etc. Additional checks such as Offsets, Names are also available
 	static bool CheckProperties(const FProperty* A, const FProperty* B
@@ -135,9 +132,8 @@ public:
 	static UFunction* FindFunction(const UObject* Object, FName FunctionName
 		, const FString& ErrorString, FProperty* InnerProperty, int32 ExpectedInputParams);
 
-
-//Generic Funcs
-public:
+//Internal Funcs 
+private:
 
 	static bool Generic_ToString(FProperty* Property, void* Data, FString& OutString);
 	static bool Generic_FromString(const FString& InString, FProperty* Property, void* Data);

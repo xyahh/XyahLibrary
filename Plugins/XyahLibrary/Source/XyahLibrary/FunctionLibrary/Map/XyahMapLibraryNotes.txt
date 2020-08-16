@@ -1,0 +1,10 @@
+// Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
+
+
+Q: Why do Functions like the "REPLACE MAP KEY" only Recognize one Map Key Type (i.e. for the case of "REPLACE MAP KEY" only OldKey and not NewKey) ?
+
+A: This seems to be a limitation with how the K2Node_CallFunction resolves the Map container parameters. For Set and Array, the values specified in the string 
+can be comma-separated. For Maps, this is not the case and only resolves the whole string as the parameter, so multiple comma-separated values will be read
+as one value. (for more information, see UK2Node_CallFunction::ConformContainerPins implementation).
+The current & quickest solution is just to treat the NewKey as a wildcard and check that the NewKey property type matches the OldKey property type. 
+Another solution would be to make a K2Node and do the whole parameter resolution there.

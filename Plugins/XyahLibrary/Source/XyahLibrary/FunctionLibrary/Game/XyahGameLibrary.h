@@ -18,7 +18,7 @@ class XYAHLIBRARY_API UXyahGameLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 //Blueprint Only	
-protected:
+private:
 
 	/*
 	Gets all the Actors of a Given Class but first Filters out all the actors whose class belongs in the ClassesToIgnore set.
@@ -89,7 +89,7 @@ public:
 		, TArray<AActor*>& OutActors, FilterPredicate FilterPred);
 
 //Generic Funcs
-public:
+private:
 
 	static void Generic_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 		, FProperty* ArrayInnerProperty, TArray<AActor*>& OutActors, const TSet<TSubclassOf<AActor>>& ClassesToIgnore
