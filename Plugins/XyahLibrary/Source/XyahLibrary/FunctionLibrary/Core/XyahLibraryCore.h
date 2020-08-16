@@ -53,7 +53,6 @@ enum EXyahNetRole
 	XNR_MAX,
 };
 
-
 UENUM(BlueprintType)
 enum EXyahNetMode
 {

@@ -15,6 +15,7 @@ class XYAHLIBRARY_API UXyahMathLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+//C++ & Blueprint
 public:
 
 	/*

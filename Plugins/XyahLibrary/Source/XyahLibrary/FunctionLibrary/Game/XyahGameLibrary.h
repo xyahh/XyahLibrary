@@ -61,7 +61,7 @@ public:
 
 	@param Level - The Level to Load
 	@param LoadingPriority - The loading priority. The higher number the higher priority. 
-	@param OnLevelLoadingComplete - called once the loading has finished.
+	@param OnLevelLoadingComplete - Called once the loading has finished. This in turn needs to call FinishLoadingLevel at some point to open the level
 	@see FinishLoadingLevel
 	*/
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Game", meta = (Keywords = "open load world stream"))

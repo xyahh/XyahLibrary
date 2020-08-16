@@ -98,11 +98,14 @@ protected:
 	*/
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Array", meta = (DisplayName = "All If", ArrayParm = "Array", AdvancedDisplay = "FunctionOwner"))
 	static bool BP_AllIf(const TArray<int32>& Array, bool& bOutAllIfReturn, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
-
-//Blueprint & C++
+	
+//C++ & Blueprint
 public:
 
-	
+	//Returns the Next Valid Index after CurrentIndex has been added to DeltaIndex (DeltaIndex can be negative)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Array", meta = (ArrayParm = "InArray"))
+	static int32 GetNextIndex(int32 CurrentIndex, int32 DeltaIndex, const TArray<int32>& InArray, bool bClampAtEnds = false);
+
 //C++ Only
 public: 
 

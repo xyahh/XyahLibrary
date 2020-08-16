@@ -33,6 +33,25 @@ bool UXyahArrayLibrary::BP_AllIf(const TArray<int32>& Array, bool& bOutAllIfRetu
 	XYAH_SHOULD_NEVER_HIT_THIS(0);
 }
 
+int32 UXyahArrayLibrary::GetNextIndex(int32 CurrentIndex, int32 DeltaIndex
+	, const TArray<int32>& InArray, bool bClampAtEnds)
+{
+	const int32 Sum = CurrentIndex + DeltaIndex;
+	const int32 Result = Sum % InArray.Num();
+
+	if (bClampAtEnds)
+	{
+		if(Sum >= InArray.Num())
+			return InArray.Num() - 1;
+		else if(Sum < 0)
+			return 0;
+	}
+
+	if (Result < 0)
+		return InArray.Num() + Result;
+	return Result;
+}
+
 void UXyahArrayLibrary::Generic_GetRandom(void* TargetArray, const FArrayProperty* ArrayProp, void* OutItem)
 {
 	if (TargetArray)

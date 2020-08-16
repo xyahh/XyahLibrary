@@ -83,27 +83,25 @@ bool UXyahGameLibrary::StartLoadingLevel(const FString& Level
 	{
 		WantedMapPath = FPackageName::FilenameToLongPackageName(*FoundMapPathPtr);
 		LoadPackageAsync(WantedMapPath
-			, FLoadPackageAsyncDelegate::CreateLambda( //TODO: Check thread safety
+			, FLoadPackageAsyncDelegate::CreateLambda(
 				[OnLevelLoadingComplete, WantedMapPath](const FName& PackageName, UPackage* LoadedPackage
 					, EAsyncLoadingResult::Type Result)
-		{
-			OnLevelLoadingComplete.ExecuteIfBound(LoadedPackage, Result == EAsyncLoadingResult::Succeeded);
-
-			switch (Result)
+				{
+					const bool bSuccessLoad = (Result == EAsyncLoadingResult::Succeeded);
+					
+					if (bSuccessLoad)
 			{
-			case EAsyncLoadingResult::Failed:
-				XYAH_LIB_LOG(Warning, TEXT("Level Loading Failed! (%s)"), *WantedMapPath);
-				break;
-
-			case EAsyncLoadingResult::Succeeded:
-				XYAH_LIB_LOG(Log, TEXT("Level Loading Success! (%s)"), *WantedMapPath);
-				break;
-
-			case EAsyncLoadingResult::Canceled:
-				XYAH_LIB_LOG(Log, TEXT("Level Loading was Cancelled! (%s)"), *WantedMapPath);
-				break;
+				XYAH_LIB_LOG(Log, TEXT("[%s] Level Loading Success!"), *WantedMapPath);
 			}
-		}), LoadingPriority, PKG_ContainsMap);
+					else
+					{
+						XYAH_LIB_LOG(Warning, TEXT("[%s] Level Loading %s!"), *WantedMapPath
+							, (Result == EAsyncLoadingResult::Failed) ? TEXT("Failed") : TEXT("Cancelled"));
+					}
+
+					OnLevelLoadingComplete.ExecuteIfBound(LoadedPackage, bSuccessLoad);		
+				}), LoadingPriority, PKG_ContainsMap);
+
 		return true;
 	}
 	return false;
@@ -116,8 +114,6 @@ void UXyahGameLibrary::FinishLoadingLevel(UObject* WorldContextObject
 	if (IsValid(LevelPackage))
 		UGameplayStatics::OpenLevel(WorldContextObject, LevelPackage->GetFName(), bAbsolute, Options);
 }
-
-
 
 bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors)
