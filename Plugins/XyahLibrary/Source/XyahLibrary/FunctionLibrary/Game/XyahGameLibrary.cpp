@@ -143,7 +143,8 @@ void UXyahGameLibrary::Generic_GetAllActorsOfClass(const UObject* WorldContextOb
 
 		if (FilterFunctionName != NAME_None)
 		{
-			FilterFunc = XYAH(Utility) FindFunction(FuncOwner, FilterFunctionName, TEXT("Get All Actor of Class Error"), ArrayInnerProperty, 1);
+			FilterFunc = XYAH(Utility) ValidateFunction(FuncOwner, FilterFunctionName, TEXT("Get All Actor of Class Error")
+				, { ArrayInnerProperty }, { FBoolProperty::StaticClass() });
 			if (FilterFunc)
 				FilterFuncParams = (uint8*)FMemory_Alloca(FilterFunc->ParmsSize);
 		}

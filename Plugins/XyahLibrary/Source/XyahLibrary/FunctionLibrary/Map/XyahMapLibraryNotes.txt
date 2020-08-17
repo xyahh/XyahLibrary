@@ -7,4 +7,5 @@ A: This seems to be a limitation with how the K2Node_CallFunction resolves the M
 can be comma-separated. For Maps, this is not the case and only resolves the whole string as the parameter, so multiple comma-separated values will be read
 as one value. (for more information, see UK2Node_CallFunction::ConformContainerPins implementation).
 The current & quickest solution is just to treat the NewKey as a wildcard and check that the NewKey property type matches the OldKey property type. 
-Another solution would be to make a K2Node and do the whole parameter resolution there.
+Another solution would be to make a new K2Node and do the whole parameter resolution there and using a different implementation of the K2Node_CallFunction.
+But this other solution is more timetaking and not worth it in my opinion.

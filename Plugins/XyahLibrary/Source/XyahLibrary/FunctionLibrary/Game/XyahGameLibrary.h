@@ -25,6 +25,10 @@ private:
 	Additionally, if present and valid, the Filter Function will be called for every actor filtered after the ClassesToIgnore.
 	If the Function returns true, the actor will be kept in the Output list, else it will be filtered out of the list.
 
+	The format of the Filter Function (if specified) should be as follows:
+	[INPUT] Actor Reference (of class "ActorClass")
+	[OUTPUT] Bool Type
+
 	@param ClassesToIgnore - The Subclasses of the ActorClass to NOT consider and be left out.
 	@param FilterFunctionName - The Name of the Function to call, if not specified, this extra Filtering Stage will not take place and return immediately. If specified this Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.

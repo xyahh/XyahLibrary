@@ -204,7 +204,8 @@ bool UXyahUtilityLibrary::CheckProperties(const FProperty* A, const FProperty* B
 	return true;
 }
 
-UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName FunctionName, const FString& ErrorString, FProperty* InnerProperty, int32 ExpectedInputParams)
+UFunction* UXyahUtilityLibrary::ValidateFunction(const UObject* Object, FName FunctionName, const FString& ErrorString
+	, TArray<FProperty*> InputProperties, TArray<FFieldClass*> OutputProperties)
 {
 	if (false == IsValid(Object))
 	{
@@ -222,70 +223,98 @@ UFunction* UXyahUtilityLibrary::FindFunction(const UObject* Object, FName Functi
 		return nullptr;
 	}
 
-	const int32 TotalParams = ExpectedInputParams + 1; //+ bool retval
+	const int32 InputParamCount = InputProperties.Num();
+	const int32 OutputParamCount = OutputProperties.Num();
+	const int32 TotalParamCount = InputParamCount + OutputParamCount; 
 
-	if (Function->NumParms != TotalParams)
+	if (Function->NumParms != TotalParamCount)
 	{
-		XYAH_LIB_LOG(Warning, TEXT("(%s)! Pred Function (%s) Parameter Count Incorrect. There should be %d input params and a bool return value!")
+		XYAH_LIB_LOG(Warning, TEXT("(%s)! Pred Function (%s) Parameter Count Incorrect. There should be %d input params and %d output params!")
 			, *ErrorString
 			, *FunctionName.ToString()
-			, ExpectedInputParams);
+			, InputParamCount, OutputParamCount);
 		return nullptr;
 	}
 
 	TFieldIterator<FProperty> FuncIterator(Function);
-	int32 ParameterCount = 0;
+	auto InputParamIter = InputProperties.CreateIterator();
+	auto OutputParamIter = OutputProperties.CreateIterator();
+	int32 CheckedParams = 0;
 
-	while (FuncIterator && (FuncIterator->PropertyFlags & CPF_Parm) && ParameterCount < TotalParams)
+	//Check for Input Params
+	while (FuncIterator && (FuncIterator->PropertyFlags & CPF_Parm) 
+		&& InputParamIter && CheckedParams <= InputParamCount)
 	{
 		FProperty* FuncProperty = *FuncIterator;
+		FProperty* InputProperty = *InputParamIter;
 
-		if (ParameterCount < ExpectedInputParams)
+		if (!XYAH(Utility) CheckProperties(FuncProperty, InputProperty))
 		{
-			if (!XYAH(Utility) CheckProperties(FuncProperty, InnerProperty))
+			if (InputProperty)
 			{
-				if (InnerProperty)
-				{
-					XYAH_LIB_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) must be of type (%s).")
-						, *ErrorString
-						, *FuncProperty->GetAuthoredName()
-						, *FunctionName.ToString()
-						, *InnerProperty->GetCPPType());
-				}
-				else
-				{
-					XYAH_LIB_LOG(Warning, TEXT("(%s)! Comparator (%s) in Function (%s) failed! Inner Property is NULL.")
-						, *ErrorString
-						, *FuncProperty->GetAuthoredName()
-						, *FunctionName.ToString());
-				}
-
-			
-				return nullptr; // Mismatch in Func Property types
-			}
-			if (FuncIterator->PropertyFlags & CPF_ReturnParm)
-			{
-				XYAH_LIB_LOG(Warning, TEXT("(%s)! There should be %d input Params in Function (%s)!")
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! Input Property (%s) in Function (%s) must be of type (%s).")
 					, *ErrorString
-					, ExpectedInputParams
-					, *FunctionName.ToString());
-				return nullptr;
+					, *FuncProperty->GetAuthoredName()
+					, *FunctionName.ToString()
+					, *InputProperty->GetCPPType());
 			}
+			else
+			{
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! Input Property (%s) in Function (%s) failed! Input Property is invalid.")
+					, *ErrorString
+					, *FuncProperty->GetAuthoredName()
+					, *FunctionName.ToString());
+			}
+			return nullptr; // Mismatch in Func Property types
 		}
-		else
+		if (FuncIterator->PropertyFlags & CPF_ReturnParm)
 		{
-			//Always check for a Bool ret val since this Func is used to Check PREDICATE funcs. 
-			if (FuncProperty->GetClass() != FBoolProperty::StaticClass()) //I think I do not need to do a rigorous Check for BoolProperty.
-			{
-				XYAH_LIB_LOG(Warning, TEXT("(%s)! Last Parameter (Return Value) in Predicate Function (%s) must be of type bool.")
-					, *ErrorString
-					, *FunctionName.ToString());
-				return nullptr; //last property (ret val) is not Bool
-			}
+			XYAH_LIB_LOG(Warning, TEXT("(%s)! There should be %d input Params in Function (%s)!")
+				, *ErrorString
+				, InputParamCount
+				, *FunctionName.ToString());
+			return nullptr;
 		}
-
-		++ParameterCount;
+		
+	
+		++CheckedParams;
 		++FuncIterator;
+		++InputParamIter;
+	}
+
+	//Reset Checked Params for Output now.
+	CheckedParams = 0;
+	//Check for Output Params
+	while (FuncIterator && (FuncIterator->PropertyFlags & (CPF_Parm)) 
+		&& (FuncIterator->PropertyFlags & (CPF_OutParm))
+		&& OutputParamIter && CheckedParams <= OutputParamCount)
+	{
+		FProperty* FuncProperty = *FuncIterator;
+		FFieldClass* OutputFieldClass = *OutputParamIter;
+
+		if (FuncProperty->GetClass() != OutputFieldClass)
+		{
+			if (OutputFieldClass)
+			{
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! Output Property (%s) in Function (%s) must be of type (%s).")
+					, *ErrorString
+					, *FuncProperty->GetAuthoredName()
+					, *FunctionName.ToString()
+					, *OutputFieldClass->GetName());
+			}
+			else
+			{
+				XYAH_LIB_LOG(Warning, TEXT("(%s)! Output Property (%s) in Function (%s) failed! Output Property is invalid.")
+					, *ErrorString
+					, *FuncProperty->GetAuthoredName()
+					, *FunctionName.ToString());
+			}
+			return nullptr; // Mismatch in Func Property types
+		}
+
+		++CheckedParams;
+		++FuncIterator;
+		++OutputParamIter;
 	}
 
 	if (FuncIterator && (FuncIterator->PropertyFlags & CPF_Parm))

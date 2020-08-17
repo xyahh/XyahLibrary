@@ -129,8 +129,8 @@ public:
 	static void Print(const FXyahPrintSettings& Settings, const FString& Format, Args&&... Arguments);
 	
 	//Finds a Function from a Given Object
-	static UFunction* FindFunction(const UObject* Object, FName FunctionName
-		, const FString& ErrorString, FProperty* InnerProperty, int32 ExpectedInputParams);
+	static UFunction* ValidateFunction(const UObject* Object, FName FunctionName
+		, const FString& ErrorString, TArray<FProperty*> InputProperties, TArray<FFieldClass*> OutputProperties);
 
 //Internal Funcs 
 private:

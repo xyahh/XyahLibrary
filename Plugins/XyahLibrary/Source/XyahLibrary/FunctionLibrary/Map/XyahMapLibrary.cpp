@@ -4,9 +4,39 @@
 #include "XyahMapLibrary.h"
 #include "Utility/XyahUtilityLibrary.h"
 
+void UXyahMapLibrary::BP_GetRandom(const TMap<int32, int32>& Map, int32& OutKey, int32& OutValue)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS();
+}
+
 bool UXyahMapLibrary::BP_ReplaceKey(const TMap<int32, int32>& InMap, const int32& OldKey, const int32& NewKey)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+bool UXyahMapLibrary::BP_RemoveIf(const TMap<int32, int32>& InMap, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+bool UXyahMapLibrary::BP_FindIf(const TMap<int32, int32>& InMap, TArray<int32>& OutKeys, FName PredicateFunctionName
+	, UObject* FunctionOwner /*= nullptr*/)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+void UXyahMapLibrary::Generic_GetRandom(void* TargetMap, const FMapProperty* MapProp, void* OutKey, void* OutValue)
+{
+	if (TargetMap)
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+		if (MapHelper.Num() > 0)
+		{
+			const int32 RandIndex = FMath::RandHelper(MapHelper.Num());
+			MapHelper.KeyProp->CopyCompleteValueFromScriptVM(OutKey, MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(RandIndex)));
+			MapHelper.ValueProp->CopyCompleteValueFromScriptVM(OutValue, MapHelper.GetValuePtr(MapHelper.FindInternalIndex(RandIndex)));
+		}
+	}
 }
 
 bool UXyahMapLibrary::Generic_ReplaceKey(const void* TargetMap, const FMapProperty* MapProperty
@@ -48,6 +78,134 @@ bool UXyahMapLibrary::Generic_ReplaceKey(const void* TargetMap, const FMapProper
 		else
 		{
 			XYAH_LIB_LOG(Warning, TEXT("Map Error! ReplaceKey Failed. NewKey and OldKey properties do not match."));
+		}
+	}
+	return false;
+}
+
+bool UXyahMapLibrary::Generic_RemoveIf(void* TargetMap, const FMapProperty* MapProp, UObject* FuncOwner, FName PredicateFunctionName)
+{
+	if (TargetMap && IsValid(FuncOwner))
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+
+		if (MapHelper.Num() > 0)
+		{
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("RemoveIf Failed")
+				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
+			{
+				//Allocations Done Here
+				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
+
+				//RemoveIf
+				for (int32 i = 0; i < MapHelper.Num(); ++i)
+				{
+					FMemory::Memzero(Params, Predicate->ParmsSize);
+					int32 ParamsProcessed = 0;
+					uint8* ReturnParam = 0;
+
+					for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+					{
+						switch (ParamsProcessed)
+						{
+						case 0: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(i))); break;
+						case 1: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetValuePtr(MapHelper.FindInternalIndex(i))); break;
+						default: ReturnParam = It->ContainerPtrToValuePtr<uint8>(Params); break;
+						}
+
+						++ParamsProcessed;
+						if (ParamsProcessed >= 3)
+							break;
+					}
+					FuncOwner->ProcessEvent(Predicate, Params);
+					if (bool* ReturnBool = (bool*)ReturnParam)
+					{
+						if (*ReturnBool)
+						{
+							MapHelper.RemoveAt(MapHelper.FindInternalIndex(i));
+							--i;
+						}
+					}
+				}
+
+				//Destroy Allocations
+				for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+				{
+					It->DestroyValue_InContainer(Params);
+				}
+				return true;
+			}
+
+
+		}
+		else
+		{
+			XYAH_LIB_LOG(Log, TEXT("RemoveIf did not take place! Map Pair count is 0!"));
+		}
+	}
+	return false;
+}
+
+bool UXyahMapLibrary::Generic_FindIf(void* TargetMap, void* OutKeysArray, const FMapProperty* TargetMapProp
+	, const FArrayProperty* OutKeysArrayProp, UObject* FuncOwner, FName PredicateFunctionName)
+{
+	if (TargetMap && OutKeysArray && IsValid(FuncOwner))
+	{
+		FScriptMapHelper MapHelper(TargetMapProp, TargetMap);
+		FScriptArrayHelper OutKeysHelper(OutKeysArrayProp, OutKeysArray);
+
+		if (MapHelper.Num() > 0)
+		{
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("FindIf Failed")
+				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
+			{
+				//Allocations Done Here
+				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
+
+				//FindIf
+				for (int32 i = 0; i < MapHelper.Num(); ++i)
+				{
+					FMemory::Memzero(Params, Predicate->ParmsSize);
+					int32 ParamsProcessed = 0;
+					uint8* ReturnParam = 0;
+
+					for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+					{
+						switch (ParamsProcessed)
+						{
+						case 0: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(i))); break;
+						case 1: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetValuePtr(MapHelper.FindInternalIndex(i))); break;
+						default: ReturnParam = It->ContainerPtrToValuePtr<uint8>(Params); break;
+						}
+
+						++ParamsProcessed;
+						if (ParamsProcessed >= 3)
+							break;
+					}
+					FuncOwner->ProcessEvent(Predicate, Params);
+					if (bool* ReturnBool = (bool*)ReturnParam)
+					{
+						if (*ReturnBool)
+						{
+							int32 Index = OutKeysHelper.AddValue();
+							MapHelper.KeyProp->CopyCompleteValueFromScriptVM(OutKeysHelper.GetRawPtr(Index), MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(i)));
+						}
+					}
+				}
+
+				//Destroy Allocations
+				for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+				{
+					It->DestroyValue_InContainer(Params);
+				}
+				return true;
+			}
+
+
+		}
+		else
+		{
+			XYAH_LIB_LOG(Log, TEXT("FindIf did not take place! Map Pair count is 0!"));
 		}
 	}
 	return false;

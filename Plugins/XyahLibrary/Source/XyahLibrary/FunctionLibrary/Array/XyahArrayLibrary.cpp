@@ -70,7 +70,8 @@ bool UXyahArrayLibrary::Generic_Sort(void* TargetArray, const FArrayProperty* Ar
 		FScriptArrayHelper ArrayHelper(ArrayProp, TargetArray);
 		if (ArrayHelper.Num() > 1)
 		{
-			if (UFunction* Predicate = XYAH(Utility) FindFunction(FuncOwner, PredicateFunctionName, TEXT("Sorting Failed"), ArrayProp->Inner, 2))
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName
+				, TEXT("Sorting Failed"), {ArrayProp->Inner, ArrayProp->Inner}, {FBoolProperty::StaticClass()}))
 			{
 				//Allocations Done Here
 				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
@@ -134,7 +135,8 @@ bool UXyahArrayLibrary::Generic_RemoveIf(void* TargetArray, const FArrayProperty
 
 		if (ArrayHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) FindFunction(FuncOwner, PredicateFunctionName, TEXT("RemoveIf Failed"), ArrayProp->Inner, 1))
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("RemoveIf Failed")
+				, { ArrayProp->Inner }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
 				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
@@ -162,7 +164,10 @@ bool UXyahArrayLibrary::Generic_RemoveIf(void* TargetArray, const FArrayProperty
 					if (bool* ReturnBool = (bool*)ReturnParam)
 					{
 						if (*ReturnBool)
+						{
 							ArrayHelper.RemoveValues(i, 1);
+							--i;
+						}
 					}
 				}
 
@@ -193,7 +198,8 @@ bool UXyahArrayLibrary::Generic_FindIf(void* TargetArray, void* OutTargetArray, 
 
 		if (ArrayHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) FindFunction(FuncOwner, PredicateFunctionName, TEXT("FindIf Failed"), ArrayProp->Inner, 1))
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("FindIf Failed")
+				, { ArrayProp->Inner }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
 				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
@@ -254,7 +260,8 @@ bool UXyahArrayLibrary::Generic_AllIf(void* TargetArray, const FArrayProperty* A
 
 		if (ArrayHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) FindFunction(FuncOwner, PredicateFunctionName, TEXT("AllIf Failed"), ArrayProp->Inner, 1))
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("AllIf Failed")
+				, { ArrayProp->Inner }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
 				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
@@ -315,7 +322,8 @@ bool UXyahArrayLibrary::Generic_AnyIf(void* TargetArray, const FArrayProperty* A
 
 		if (ArrayHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) FindFunction(FuncOwner, PredicateFunctionName, TEXT("AllIf Failed"), ArrayProp->Inner, 1))
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("AllIf Failed")
+				, { ArrayProp->Inner }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
 				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);

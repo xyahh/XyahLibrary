@@ -34,6 +34,10 @@ private:
 	This Predicate Function will be called for every comparison. If the Function returns true, the swap will take place (i.e. out of order), else
 	there will be no swap.
 	
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type, Array Element Type
+	[OUTPUT] Bool Type
+
 	@param Array - The Array to Sort.
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally. 
@@ -48,6 +52,10 @@ private:
 	Removes the elements from the given array that satisfy the Predicate Function set via its Name and Function Owner.
 	This Predicate Function will be called for every element. If the Function returns true, the element will be removed.
 
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+
 	@param Array - The Array to Remove Elements from. 
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
@@ -61,7 +69,11 @@ private:
 	Finds the elements from the given array that satisfy the Predicate Function set via its Name and Function Owner.
 	This Predicate Function will be called for every element. If the Function returns true, the element will be put into the OutArray of Found Elements.
 
-	@param Array - The Array to Remove Elements from.
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+
+	@param Array - The Array to Find Elements from
 	@param OutArray - The Array of Found Elements.
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
@@ -75,7 +87,11 @@ private:
 	Returns true if ANY given array element satisfies the Predicate Function set via its Name and Function Owner.
 	This Predicate Function will be called for every element until one that returns true is found.
 
-	@param Array - The Array to Remove Elements from.
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+
+	@param Array - The Array to check
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
 
@@ -89,7 +105,11 @@ private:
 	Returns true if ALL given array elements satisfy the Predicate Function set via its Name and Function Owner.
 	This Predicate Function will be called for every element. 
 
-	@param Array - The Array to Remove Elements from.
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+
+	@param Array - The Array to check
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
 
