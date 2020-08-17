@@ -33,8 +33,9 @@ bool UXyahMapLibrary::Generic_ReplaceKey(const void* TargetMap, const FMapProper
 				//"Rename" the OldKey to the NewKey and Rehash.
 				if (FoundIndex != INDEX_NONE)
 				{
-					OldKeyProp->CopySingleValueToScriptVM(MapHelper.GetKeyPtr(FoundIndex), NewKeyPtr);
-					MapHelper.Rehash(); 
+					//MapHelper.AddPair(NewKeyPtr, MapHelper.GetValuePtr(FoundIndex));
+					OldKeyProp->CopyCompleteValueToScriptVM(MapHelper.GetKeyPtr(FoundIndex), NewKeyPtr);
+					MapHelper.Rehash();
 					return true;
 				}
 			}
