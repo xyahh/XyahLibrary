@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "XyahLibrary.h"
-#include "../Settings/XyahSettings.h"
+#include "XyahSettings.h"
 
 #define LOCTEXT_NAMESPACE "FXyahLibraryModule"
 
@@ -27,13 +27,13 @@ void FXyahLibraryModule::RegisterSettings()
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr <ISettingsModule>("Settings"))
 	{
 		//add a category for the set
-		ISettingsSectionPtr XyahSettings = SettingsModule->RegisterSettings("Project", "Xyah", "Core"
-			, FText::FromString("Core")
-			, FText::FromString("Xyah Core Settings"),
-			GetMutableDefault <UXyahCoreSettings>());
+		ISettingsSectionPtr XyahSettings = SettingsModule->RegisterSettings("Project", "Xyah", "Config"
+			, FText::FromString("Config")
+			, FText::FromString("Xyah Library Plugin Core Settings"),
+			GetMutableDefault <UXyahConfig>());
 
-		//Add Core as a Reserved Name
-		ReservedSettingsNames.Add("Core");
+		//Add Config as a Reserved Name
+		ReservedSettingsNames.Add("Config");
 
 		if (XyahSettings.IsValid())
 		{
@@ -41,7 +41,7 @@ void FXyahLibraryModule::RegisterSettings()
 			XyahSettings->OnModified().BindRaw(this, &FXyahLibraryModule::OnSettingsModified);
 		}
 
-		if (const UXyahCoreSettings* XyahCore = GetDefault<UXyahCoreSettings>())
+		if (const UXyahConfig* XyahCore = GetDefault<UXyahConfig>())
 		{
 			if (XyahCore->Settings.Num() > 0)
 				RegisteredSettingsNames.Reserve(XyahCore->Settings.Num());

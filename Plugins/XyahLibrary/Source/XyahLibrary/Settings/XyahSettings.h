@@ -22,7 +22,7 @@ public:
 	void SaveSettings();
 };
 
-UCLASS(DefaultConfig)
+UCLASS(config = XyahSettings, DefaultConfig, Blueprintable)
 class XYAHLIBRARY_API UXyahDefaultSettings : public UXyahSettings
 {
 	GENERATED_BODY()
@@ -50,18 +50,19 @@ struct XYAHLIBRARY_API FXyahSettingsInfo
 
 
 /**
- * 
+ * Do not use this class for additional Settings!
+ * Instead, use XyahSettings & XyahDefaultSettings!
  */
-UCLASS(config = XyahSettings, DefaultConfig)
-class XYAHLIBRARY_API UXyahCoreSettings : public UObject
+UCLASS(config = XyahSettings, DefaultConfig, NotBlueprintable, HideDropdown)
+class XYAHLIBRARY_API UXyahConfig final : public UObject 
 {
 	GENERATED_BODY()
 	
 
 public:
 	
-	//The Settings Classes to use. Must restart Editor to see the changes.
-	UPROPERTY(Config, EditAnywhere, Category = "Xyah")
+	//The Settings Classes to add when the Editor loads. Must restart Editor to see the changes.
+	UPROPERTY(Config, EditAnywhere, Category = "Custom Settings")
     TArray<FXyahSettingsInfo> Settings;
 
 };
