@@ -46,8 +46,10 @@ FORCEINLINE DEFINE_FUNCTION(UXyahUtilityLibrary::execFromString)
 }
 
 
-template<class... Args>
-void UXyahUtilityLibrary::Print(const FXyahPrintSettings& Settings, const FString& Format, Args&&... Arguments)
+template<typename FmtType, class... Args>
+typename TEnableIf<TIsArrayOrRefOfType<FmtType, TCHAR>::Value, void> UXyahUtilityLibrary::Print(const FXyahPrint& Settings
+	, const FmtType& Format, Args&&... Arguments)
 {
-	PrintMessage(FString::Printf(Format, Arguments), Settings);
+	PrintMessage(FString::Printf(Format, Arguments...), Settings);
+	return TEnableIf<true, void>();
 }

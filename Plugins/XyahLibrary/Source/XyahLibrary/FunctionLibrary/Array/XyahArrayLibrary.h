@@ -9,6 +9,8 @@
 #include "UObject/UnrealType.h"
 #include "XyahArrayLibrary.generated.h"
 
+#define XYAH_ARRAY_LIBRARY		1
+
 /**
  * 
  */
@@ -129,12 +131,27 @@ public:
 //C++ Only
 public: 
 
+	//Gets a Random Element from the given Array
 	template<typename ArrayElement>
-	static ArrayElement GetRandom(const TArray<ArrayElement>& InArray);
+	static bool GetRandom(const TArray<ArrayElement>& InArray, ArrayElement* OutElement);
 
+	/*
+	Checks if Any Element of the array satisfy the Predicate Function
+
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+	*/
 	template<typename ArrayElement, typename Predicate>
 	static bool AnyIf(const TArray<ArrayElement>& InArray, Predicate Pred);
 
+	/*
+	Checks if All Elements of the array satisfy the Predicate Function
+
+	The format of the Function should be as follows:
+	[INPUT] Array Element Type
+	[OUTPUT] Bool Type
+	*/
 	template<typename ArrayElement, typename Predicate>
 	static bool AllIf(const TArray<ArrayElement>& InArray, Predicate Pred);
 

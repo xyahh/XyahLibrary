@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "XyahLibraryCore.h"
+#include "XyahGameTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahGameLibrary.generated.h"
+
+#define XYAH_GAME_LIBRARY		1
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnLevelLoadingComplete, UObject*, LevelPackage, bool, bSucceeded);
 
@@ -55,9 +58,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "server standalone client listen dedicated"))
 	static EXyahNetMode GetNetMode(UObject* Object);
 
-	//Forces the Addition of Cheats on Non-Shipping Builds. It doesn't do anything in Shipping Builds
+	//Forces the Creation of the Cheat Manager automatically in NON-Shipping Builds or Editor. If bIncludedInShipping is true, then it will force add cheats in shipping builds as well (Should be used Wisely!)
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Game")
-	static void ForceAddCheats(class APlayerController* PC);
+	static void ForceAddCheats(class APlayerController* PC, bool bIncludedInShipping);
 
 	/*
 	Loads the Level in the Background (ASYNC) and calls "OnLevelLoadingComplete" once this process has been completed.
@@ -91,6 +94,11 @@ public:
 	template<typename FilterPredicate>
 	static bool GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, const TSet<TSubclassOf<AActor>>& ClassesToIgnore
 		, TArray<AActor*>& OutActors, FilterPredicate FilterPred);
+
+	//Gets all the Actors that belong to a class. Doesn't consider those child classes in the "ClassesToIgnore" set or if the FilterPred function returns false. Returns true if there were actors found.
+	template<typename FilterPredicate>
+	static bool GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
+		, FilterPredicate FilterPred);
 
 //Generic Funcs
 private:

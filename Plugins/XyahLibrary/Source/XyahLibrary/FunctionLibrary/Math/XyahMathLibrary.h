@@ -7,6 +7,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XyahMathLibrary.generated.h"
 
+#define XYAH_MATH_LIBRARY		1
+
 /**
  * 
  */

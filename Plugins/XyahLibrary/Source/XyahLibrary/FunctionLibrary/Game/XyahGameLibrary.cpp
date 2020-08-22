@@ -1,11 +1,10 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
-
 #include "XyahGameLibrary.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
-#include "Utility/XyahUtilityLibrary.h"
+#include "XyahUtilityLibrary.h"
 
 bool UXyahGameLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , TArray<AActor*>& OutActors, const TSet<TSubclassOf<AActor>>& ClassesToIgnore, FName FilterFunctionName /*= NAME_None*/
@@ -55,14 +54,12 @@ EXyahNetMode UXyahGameLibrary::GetNetMode(UObject* Object)
 }
 
 #include "GameFramework/PlayerController.h"
-void UXyahGameLibrary::ForceAddCheats(class APlayerController* PC)
+void UXyahGameLibrary::ForceAddCheats(class APlayerController* PC, bool bIncludedInShipping)
 {
-#if !UE_BUILD_SHIPPING
-	if (IsValid(PC))
+	if ((!UE_BUILD_SHIPPING || bIncludedInShipping) && IsValid(PC))
 	{
 		PC->AddCheats(true);
 	}
-#endif
 }
 
 #include "UObject/UObjectGlobals.h"

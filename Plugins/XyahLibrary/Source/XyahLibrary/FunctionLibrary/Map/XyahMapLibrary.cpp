@@ -1,10 +1,14 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
-
 #include "XyahMapLibrary.h"
-#include "Utility/XyahUtilityLibrary.h"
+#include "XyahUtilityLibrary.h"
 
 void UXyahMapLibrary::BP_GetRandom(const TMap<int32, int32>& Map, int32& OutKey, int32& OutValue)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS();
+}
+
+void UXyahMapLibrary::BP_GetFromIndex(const TMap<int32, int32>& Map, int32 Index, int32& OutKey, int32& OutValue)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS();
 }
@@ -25,6 +29,29 @@ bool UXyahMapLibrary::BP_FindIf(const TMap<int32, int32>& InMap, TArray<int32>& 
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
+bool UXyahMapLibrary::BP_SafeAdd(const TMap<int32, int32>& InMap, const int32& Key, const int32& Value)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+int32 UXyahMapLibrary::GetNextIndex(int32 CurrentIndex, int32 DeltaIndex, const TMap<int32, int32>& InMap, bool bClampAtEnds /*= false*/)
+{
+	const int32 Sum = CurrentIndex + DeltaIndex;
+	const int32 Result = Sum % InMap.Num();
+
+	if (bClampAtEnds)
+	{
+		if (Sum >= InMap.Num())
+			return InMap.Num() - 1;
+		else if (Sum < 0)
+			return 0;
+	}
+
+	if (Result < 0)
+		return InMap.Num() + Result;
+	return Result;
+}
+
 void UXyahMapLibrary::Generic_GetRandom(void* TargetMap, const FMapProperty* MapProp, void* OutKey, void* OutValue)
 {
 	if (TargetMap)
@@ -35,6 +62,19 @@ void UXyahMapLibrary::Generic_GetRandom(void* TargetMap, const FMapProperty* Map
 			const int32 RandIndex = FMath::RandHelper(MapHelper.Num());
 			MapHelper.KeyProp->CopyCompleteValueFromScriptVM(OutKey, MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(RandIndex)));
 			MapHelper.ValueProp->CopyCompleteValueFromScriptVM(OutValue, MapHelper.GetValuePtr(MapHelper.FindInternalIndex(RandIndex)));
+		}
+	}
+}
+
+void UXyahMapLibrary::Generic_GetFromIndex(void* TargetMap, const FMapProperty* MapProp, int32 Index, void* OutKey, void* OutValue)
+{
+	if (TargetMap)
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+		if (MapHelper.Num() > 0 && Index >= 0 && Index < MapHelper.Num())
+		{
+			MapHelper.KeyProp->CopyCompleteValueFromScriptVM(OutKey, MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(Index)));
+			MapHelper.ValueProp->CopyCompleteValueFromScriptVM(OutValue, MapHelper.GetValuePtr(MapHelper.FindInternalIndex(Index)));
 		}
 	}
 }
@@ -206,6 +246,20 @@ bool UXyahMapLibrary::Generic_FindIf(void* TargetMap, void* OutKeysArray, const 
 		else
 		{
 			XYAH_LIB_LOG(Log, TEXT("FindIf did not take place! Map Pair count is 0!"));
+		}
+	}
+	return false;
+}
+
+bool UXyahMapLibrary::Generic_SafeAdd(void* TargetMap, const FMapProperty* MapProp, const void* Key, const void* Value)
+{
+	if (TargetMap &&  Key && Value)
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+		if (!MapHelper.FindValueFromHash(Key))
+		{
+			MapHelper.AddPair(Key, Value);
+			return true;
 		}
 	}
 	return false;

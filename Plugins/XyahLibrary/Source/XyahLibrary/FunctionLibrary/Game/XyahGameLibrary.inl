@@ -21,6 +21,25 @@ FORCEINLINE DEFINE_FUNCTION(UXyahGameLibrary::execBP_GetAllActorsOfClass)
 	P_NATIVE_END;
 }
 
+#include "EngineUtils.h"
+template<typename FilterPredicate>
+bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors
+	, FilterPredicate FilterPred)
+{
+	OutActors.Empty();
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		for (TActorIterator<AActor> It(World, ActorClass); It; ++It)
+		{
+			AActor* CurrActor = *It;
+			if (CurrActor && FilterPred(CurrActor))
+				OutActors.Add(CurrActor);
+		}
+		return OutActors.Num() > 0;
+	}
+	return false;
+}
+
 template<typename FilterPredicate>
 bool UXyahGameLibrary::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass
 , const TSet<TSubclassOf<AActor>>& ClassesToIgnore, TArray<AActor*>& OutActors, FilterPredicate FilterPred)

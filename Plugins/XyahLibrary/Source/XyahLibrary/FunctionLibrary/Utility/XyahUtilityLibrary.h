@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "XyahLibraryCore.h"
+#include "XyahUtilityTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "XyahUtilityLibrary.generated.h"
+
+#define XYAH_UTILITY_LIBRARY	1
 
 /**
  * 
@@ -75,20 +78,22 @@ public:
 	@param TextScale - the Scale of the Text (default 1.f)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "log print", AdvancedDisplay="1", AutoCreateRefTerm="Settings", DevelopmentOnly))
-	static void PrintMessage(const FString& Message, const FXyahPrintSettings& Settings);
+	static void PrintMessage(const FString& Message, const FXyahPrint& Settings);
 
 
 	/*
 	Gets all the Properties and their values of a Given UObject.
 	@param OwnerObject - the Object whose properties to get
 	@param ExcludeParents - The parents of the Object whose properties to ignore
-	@param PropertyFlags - At least 1 flag must be satisfied by a property for it to be considered. If no flags are selected, no check will take place and all properties will be considered. 
+	@param IncludedFlags - Any Property satisfying any flag here will be considered for inclusion. If no flags are set, then all properties pass are considered. 
+	@param ExcludedFlags - Any Property satisfying any flag here will be excluded. If no flags are set, then this check is not done.
 	@param OutProperties - Result Map of the Property Names (Keys) and Property Values (Values)
 	*/
 	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (AutoCreateRefTerm = "ExcludeParents", AdvancedDisplay = "bIncludeReplicated,bIncludeNonReplicated"))
 	static void GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
 	, TMap<FString, FString>& OutProperties
-	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 PropertyFlags = 2);
+	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 IncludedFlags = 2
+	, UPARAM(meta = (Bitmask, BitmaskEnum = "EXyahPropertyFlags")) int32 ExcludedFlags = 0);
 
 	/*
 	Sets a Given Property belonging to the Given Object a value. The formatting of the String must be in Simple Object Text Format
@@ -125,8 +130,9 @@ public:
 	, bool bCheckPropertyOffsets = false, bool bCheckPropertyNames = false);
 
 	//A Convenience Func for the PrintMessage Func
-	template<class... Args>
-	static void Print(const FXyahPrintSettings& Settings, const FString& Format, Args&&... Arguments);
+	template<typename FmtType, class... Args>
+	static typename TEnableIf<TIsArrayOrRefOfType<FmtType, TCHAR>::Value, void> Print(const FXyahPrint& Settings
+		, const FmtType& Format, Args&&... Arguments);
 	
 	//Finds a Function from a Given Object
 	static UFunction* ValidateFunction(const UObject* Object, FName FunctionName

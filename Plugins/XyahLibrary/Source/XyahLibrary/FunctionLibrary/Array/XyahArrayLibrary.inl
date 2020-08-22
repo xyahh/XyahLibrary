@@ -3,12 +3,16 @@
 #pragma once
 
 template<typename ArrayElement>
-ArrayElement UXyahArrayLibrary::GetRandom(const TArray<ArrayElement>& InArray)
+bool UXyahArrayLibrary::GetRandom(const TArray<ArrayElement>& InArray, ArrayElement* OutElement)
 {
-	if(InArray.Num() > 0)
-		return InArray[FMath::Rand() % InArray.Num()];
-	XYAH_LIB_LOG(Warning, TEXT("Attempting to get Random Element from Empty Array!"));
-	return ArrayElement{};
+	if (InArray.Num() > 0 && OutElement)
+	{
+		*OutElement = InArray[FMath::Rand() % InArray.Num()];
+		return true;
+	}
+	
+	//InArray is Empty or OutElement is NULLPTR
+	return false; 
 }
 
 template<typename ArrayElement, typename Predicate>

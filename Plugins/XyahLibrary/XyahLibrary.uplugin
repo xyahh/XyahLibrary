@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "XyahLibrary",
-	"Description": "Runtime Library for Common Functionalities designed for Blueprints and C++ ",
+	"Description": "Runtime Library for Common Functionalities. For Blueprints & C++",
 	"Category": "Other",
 	"CreatedBy": "Juan Marcelo Portillo",
 	"CreatedByURL": "",

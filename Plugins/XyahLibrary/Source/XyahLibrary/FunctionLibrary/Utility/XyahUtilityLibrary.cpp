@@ -1,7 +1,7 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahUtilityLibrary.h"
-#include "Math/XyahMathLibrary.h"
+#include "XyahMathLibrary.h"
 #include "Engine/Engine.h"
 
 // Blueprint ONLY
@@ -26,7 +26,7 @@ void UXyahUtilityLibrary::GetClassDefaultObject(TSubclassOf<UObject> ObjectClass
 	OutObject = GetMutableDefault<UObject>(ObjectClass);
 }
 
-#include "XyahLibrary/Settings/XyahSettings.h"
+#include "XyahSettings.h"
 void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, UXyahSettings*& OutSettings)
 {
 	OutSettings = GetMutableDefault<UXyahSettings>(SettingsClass);
@@ -43,7 +43,7 @@ void UXyahUtilityLibrary::StatFPS(float& FPS, float& Milliseconds)
 }
 
 //Blueprint & C++
-void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrintSettings& Settings)
+void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrint& Settings)
 {
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 
@@ -75,18 +75,34 @@ void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrintS
 }
 
 void UXyahUtilityLibrary::GetProperties(UObject* OwnerObject, const TSet<TSubclassOf<UObject>>& ExcludeParents
-, TMap<FString, FString>& OutProperties, int32 PropertyFlags /*= 0*/)
+, TMap<FString, FString>& OutProperties, int32 IncludedFlags, int32 ExcludedFlags)
 {
 	OutProperties.Empty();
 	if (OwnerObject)
 	{
+		bool bIncludeProperty;
+		uint64 PropertyFlags;
 		for (TFieldIterator<FProperty> PropertyIter(OwnerObject->GetClass()); PropertyIter; ++PropertyIter)
 		{
 			if (ExcludeParents.Contains(PropertyIter->GetOwnerClass()))
 				continue;
+			
+			PropertyFlags = static_cast<uint64>(PropertyIter->GetPropertyFlags());
+			bIncludeProperty = true;
 
-			if(PropertyFlags == EXyahPropertyFlags::XPF_All 
-			|| (static_cast<uint64>(PropertyIter->GetPropertyFlags()) & ConvertXyahPropertyFlags(PropertyFlags)))
+			//Test #1: Check that the Property has the IncludedFlags
+			if (IncludedFlags != EXyahPropertyFlags::XPF_None)
+			{
+				bIncludeProperty = (PropertyFlags & ConvertXyahPropertyFlags(IncludedFlags));
+			}
+
+			//Test #2: From the Properties that passed Test #1, check that the Property does NOT have the Excluded Flags
+			if (bIncludeProperty && (ExcludedFlags != EXyahPropertyFlags::XPF_None))
+			{
+				bIncludeProperty = !(PropertyFlags & ConvertXyahPropertyFlags(ExcludedFlags));
+			}
+
+			if(bIncludeProperty)
 			{
 				FString PropertyValue;
 				GetPropertyValueString(OwnerObject, *PropertyIter, PropertyValue);

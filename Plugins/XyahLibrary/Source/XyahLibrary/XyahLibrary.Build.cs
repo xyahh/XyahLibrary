@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using System.IO;
 
 public class XyahLibrary : ModuleRules
 {
@@ -10,22 +11,18 @@ public class XyahLibrary : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
-			}
-			);
-				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"XyahLibrary",
-				"XyahLibrary/FunctionLibrary",
-                "XyahLibrary/FunctionLibrary/Core",
-                "XyahLibrary/Graph",
-                "XyahLibrary/Components",
-				"XyahLibrary/Components/Core",
-                "XyahLibrary/Settings",
-				// ... add other private include paths required here ...
-			}
+				Path.Combine(ModuleDirectory, "FunctionLibrary"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Core"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Utility"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Game"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Math"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Array"),
+                Path.Combine(ModuleDirectory, "FunctionLibrary/Map"),
+                Path.Combine(ModuleDirectory, "Graph"),
+                Path.Combine(ModuleDirectory, "Components"),
+                Path.Combine(ModuleDirectory, "Components/Core"),
+                Path.Combine(ModuleDirectory, "Settings"),
+            }
 			);
 			
 		

@@ -1,7 +1,7 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
-
 #include "XyahSettings.h"
+
 UXyahSettings::UXyahSettings()
 {	
 }

@@ -1,6 +1,5 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
-
 #include "BillboardSceneComponent.h"
 #include "GameFramework/PlayerController.h"
 
@@ -17,7 +16,9 @@ UBillboardSceneComponent::UBillboardSceneComponent()
 
 	bEnableRotation = true;
 	bEnableScale = true;
-	bOnlyConsiderYaw = true;
+	bConsiderRoll = false;
+	bConsiderPitch = false;
+	bConsiderYaw = true;
 }
 
 
@@ -65,11 +66,11 @@ void UBillboardSceneComponent::UpdateBillboard(const FVector& ReferenceLocation,
 	if (bEnableRotation)
 	{
 		FRotator Rotation = UKismetMathLibrary::MakeRotFromXZ(-1.f * RealDisplacement, ReferenceQuat.GetUpVector());
-		if (bOnlyConsiderYaw)
-		{
-			Rotation.Roll = 0.f;
-			Rotation.Pitch = 0.f;
-		}
+		
+		Rotation.Roll = (bConsiderRoll) ? Rotation.Roll : 0.f;
+		Rotation.Pitch = (bConsiderPitch) ? Rotation.Pitch : 0.f;
+		Rotation.Yaw = (bConsiderYaw) ? Rotation.Yaw : 0.f;
+
 		SetWorldRotation(Rotation);
 	}
 }
