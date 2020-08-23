@@ -65,6 +65,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (Keywords = "FPS performance frame framerate"))
 	static void StatFPS(float& FPS, float & Milliseconds);
 
+	//Sets the Maximum FPS allowed
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Utility", meta = (Keywords = "FPS performance frame framerate limit max"))
+	static void SetMaxFPS(float MaxFPS);
+
+	//Gets the Current Max FPS Set
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Utility", meta = (ReturnDisplayName = "FPS", Keywords = "FPS performance frame framerate limit max"))
+	static float GetMaxFPS();
+
 	/* 
 	Prints a String to either the Screen, Log, or both. 
 	@param InString - The String to Print

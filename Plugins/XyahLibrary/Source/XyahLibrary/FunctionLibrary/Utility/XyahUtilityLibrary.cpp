@@ -42,6 +42,19 @@ void UXyahUtilityLibrary::StatFPS(float& FPS, float& Milliseconds)
 #endif
 }
 
+void UXyahUtilityLibrary::SetMaxFPS(float MaxFPS)
+{
+	if(GEngine) 
+		GEngine->SetMaxFPS(MaxFPS);
+}
+
+float UXyahUtilityLibrary::GetMaxFPS()
+{
+	if(GEngine) 
+		return GEngine->GetMaxFPS();
+	return 0.f;
+}
+
 //Blueprint & C++
 void UXyahUtilityLibrary::PrintMessage(const FString& Message, const FXyahPrint& Settings)
 {
