@@ -45,6 +45,14 @@ private:
 
 //C++ and Blueprint
 public:
+	
+	//Spawns a clone of a given actor at the actor's world transform.
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (Keywords = "copy duplicate"))
+	static void CloneActor(AActor* ActorToClone, AActor*& CloneResult);
+
+	//Spawns a clone of a given actor at a given world transform
+	UFUNCTION(BlueprintCallable, Category = "XyahLibrary|Actor", meta = (AutoCreateRefTerm = "Transform", Keywords = "copy duplicate"))
+	static void CloneActorWithTransform(AActor* ActorToClone, const FTransform& Transform, AActor*& CloneResult);
 
 	//Gets the Net Local Role of a Actor or Actor Component (other UObjects will return EXyahNetRole::None)
 	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Actor", meta = (Keywords = "net role authority proxy simulated autonomous"))

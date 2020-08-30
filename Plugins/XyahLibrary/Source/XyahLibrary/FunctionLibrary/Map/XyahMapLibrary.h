@@ -59,7 +59,8 @@ private:
 	This Predicate Function will be called for every pair (Key, Value). If the Function returns true, the element will be removed.
 
 	The format of the Function should be as follows:
-	[INPUT] Map Key Type, Map Value Type
+	[INPUT] Map Key Type
+	[INPUT] Map Value Type
 	[OUTPUT] Bool Type
 
 	@param InMap - The Map to Remove Elements from.
@@ -76,7 +77,8 @@ private:
 	This Predicate Function will be called for every pair. If the Function returns true, the pair's Key will be put into the OutArray of Keys.
 
 	The format of the Function should be as follows:
-	[INPUT] Map Key Type, Map Value Type
+	[INPUT] Map Key Type
+	[INPUT] Map Value Type
 	[OUTPUT] Bool Type
 
 	@param InMap - The Map to Find Pairs from.
@@ -90,11 +92,49 @@ private:
 	static bool BP_FindIf(const TMap<int32, int32>& InMap, TArray<int32>& OutKeys, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
 
 	/*
+	Returns true if ALL given map pairs satisfy the Predicate Function set via its Name and Function Owner.
+	This Predicate Function will be called for every pair in the map. 
+
+	The format of the Function should be as follows:
+	[INPUT] Map Key Type
+	[INPUT] Map Value Type
+	[OUTPUT] Bool Type
+
+	@param InMap - The Map to check
+	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
+	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
+
+	@param bEvaluation - The return value of the AllIf process
+	@return [bool] Whether AllIf actually took place or there was an error processing it.
+	*/
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Map", meta = (DisplayName = "All If", ReturnDisplayName = "Valid Predicate", MapParam = "InMap", AdvancedDisplay = "FunctionOwner"))
+	static bool BP_AllIf(const TMap<int32, int32>& InMap, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
+
+	/*
+	Returns true if any pair in the given map satisfies the Predicate Function set via its Name and Function Owner.
+	This Predicate Function will be called for every pair in the map until a pair that returns true is found.
+
+	The format of the Function should be as follows:
+	[INPUT] Map Key Type
+	[INPUT] Map Value Type
+	[OUTPUT] Bool Type
+
+	@param InMap - The Map to check
+	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
+	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
+
+	@param bEvaluation - The return value of the AnyIf process
+	@return [bool] Whether AnyIf actually took place or there was an error processing it.
+	*/
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Map", meta = (DisplayName = "Any If", ReturnDisplayName = "Valid Predicate", MapParam = "InMap", AdvancedDisplay = "FunctionOwner"))
+	static bool BP_AnyIf(const TMap<int32, int32>& InMap, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
+
+	/*
 	Adds the Key and Value to the Map if the Key is not in present in the map
 	@return [bool] Whether the Addition of the given Pair actually took place
 	*/
-	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Map", meta = (DisplayName = "Safe Add", CompactNodeTitle = "SAFE ADD", MapParam = "InMap", MapKeyParam = "Key", MapValueParam = "Value", Keywords = "insert safe check", AutoCreateRefTerm = "Key,Value"))
-	static bool BP_SafeAdd(const TMap<int32, int32>& InMap, const int32& Key, const int32& Value);
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Map", meta = (DisplayName = "Add New", CompactNodeTitle = "ADD NEW", MapParam = "InMap", MapKeyParam = "Key", MapValueParam = "Value", Keywords = "insert safe check", AutoCreateRefTerm = "Key,Value"))
+	static bool BP_AddNew(const TMap<int32, int32>& InMap, const int32& Key, const int32& Value);
 
 //C++ & Blueprints
 public:
@@ -158,7 +198,13 @@ private:
 	static bool Generic_FindIf(void* TargetMap, void* OutKeysArray, const FMapProperty* TargetMapProp
 		, const FArrayProperty* OutKeysArrayProp, UObject* FuncOwner, FName PredicateFunctionName);
 
-	static bool Generic_SafeAdd(void* TargetMap, const FMapProperty* MapProp, const void* Key, const void* Value);
+	static bool Generic_AllIf(void* TargetMap, const FMapProperty* MapProp, bool& OutAllIfRetVal
+		, UObject* FuncOwner, FName PredicateFunctionName);
+
+	static bool Generic_AnyIf(void* TargetMap, const FMapProperty* MapProp, bool& OutAnyIfRetVal
+		, UObject* FuncOwner, FName PredicateFunctionName);
+
+	static bool Generic_AddNew(void* TargetMap, const FMapProperty* MapProp, const void* Key, const void* Value);
 	
 //Exec Funcs
 public:
@@ -168,7 +214,9 @@ public:
 	DECLARE_FUNCTION(execBP_ReplaceKey);
 	DECLARE_FUNCTION(execBP_RemoveIf);
 	DECLARE_FUNCTION(execBP_FindIf);
-	DECLARE_FUNCTION(execBP_SafeAdd);
+	DECLARE_FUNCTION(execBP_AnyIf);
+	DECLARE_FUNCTION(execBP_AllIf);
+	DECLARE_FUNCTION(execBP_AddNew);
 };
 
 

@@ -29,7 +29,17 @@ bool UXyahMapLibrary::BP_FindIf(const TMap<int32, int32>& InMap, TArray<int32>& 
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
-bool UXyahMapLibrary::BP_SafeAdd(const TMap<int32, int32>& InMap, const int32& Key, const int32& Value)
+bool UXyahMapLibrary::BP_AllIf(const TMap<int32, int32>& InMap, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+bool UXyahMapLibrary::BP_AnyIf(const TMap<int32, int32>& InMap, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner /*= nullptr*/)
+{
+	XYAH_SHOULD_NEVER_HIT_THIS(false);
+}
+
+bool UXyahMapLibrary::BP_AddNew(const TMap<int32, int32>& InMap, const int32& Key, const int32& Value)
 {
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
@@ -131,7 +141,7 @@ bool UXyahMapLibrary::Generic_RemoveIf(void* TargetMap, const FMapProperty* MapP
 
 		if (MapHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("RemoveIf Failed")
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("Map RemoveIf Failed")
 				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
@@ -196,7 +206,7 @@ bool UXyahMapLibrary::Generic_FindIf(void* TargetMap, void* OutKeysArray, const 
 
 		if (MapHelper.Num() > 0)
 		{
-			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("FindIf Failed")
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("Map FindIf Failed")
 				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
 			{
 				//Allocations Done Here
@@ -251,7 +261,129 @@ bool UXyahMapLibrary::Generic_FindIf(void* TargetMap, void* OutKeysArray, const 
 	return false;
 }
 
-bool UXyahMapLibrary::Generic_SafeAdd(void* TargetMap, const FMapProperty* MapProp, const void* Key, const void* Value)
+bool UXyahMapLibrary::Generic_AllIf(void* TargetMap, const FMapProperty* MapProp, bool& OutAllIfRetVal, UObject* FuncOwner, FName PredicateFunctionName)
+{
+	if (TargetMap && IsValid(FuncOwner))
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+
+		if (MapHelper.Num() > 0)
+		{
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("Map AllIf Failed")
+				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
+			{
+				//Allocations Done Here
+				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
+
+				OutAllIfRetVal = true;
+
+				//Allif
+				for (int32 i = 0; i < MapHelper.Num(); ++i)
+				{
+					FMemory::Memzero(Params, Predicate->ParmsSize);
+					int32 ParamsProcessed = 0;
+					uint8* ReturnParam = 0;
+
+					for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+					{
+						switch (ParamsProcessed)
+						{
+						case 0: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(i))); break;
+						case 1: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetValuePtr(MapHelper.FindInternalIndex(i))); break;
+						default: ReturnParam = It->ContainerPtrToValuePtr<uint8>(Params); break;
+						}
+
+						++ParamsProcessed;
+						if (ParamsProcessed >= 3)
+							break;
+					}
+					FuncOwner->ProcessEvent(Predicate, Params);
+					if (bool* ReturnBool = (bool*)ReturnParam)
+					{
+						if (false == *ReturnBool)
+							OutAllIfRetVal = false;
+					}
+				}
+
+				//Destroy Allocations
+				for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+				{
+					It->DestroyValue_InContainer(Params);
+				}
+				return true;
+			}
+
+
+		}
+		else
+		{
+			XYAH_LIB_LOG(Log, TEXT("AllIf did not take place! Array Element count is 0!"));
+		}
+	}
+	return false;
+}
+
+bool UXyahMapLibrary::Generic_AnyIf(void* TargetMap, const FMapProperty* MapProp, bool& OutAnyIfRetVal, UObject* FuncOwner, FName PredicateFunctionName)
+{
+	if (TargetMap && IsValid(FuncOwner))
+	{
+		FScriptMapHelper MapHelper(MapProp, TargetMap);
+
+		if (MapHelper.Num() > 0)
+		{
+			if (UFunction* Predicate = XYAH(Utility) ValidateFunction(FuncOwner, PredicateFunctionName, TEXT("Map AnyIf Failed")
+				, { MapHelper.KeyProp, MapHelper.ValueProp }, { FBoolProperty::StaticClass() }))
+			{
+				//Allocations Done Here
+				uint8* Params = (uint8*)FMemory_Alloca(Predicate->ParmsSize);
+
+				OutAnyIfRetVal = false;
+
+				//AnyIf
+				for (int32 i = 0; i < MapHelper.Num(); ++i)
+				{
+					FMemory::Memzero(Params, Predicate->ParmsSize);
+					int32 ParamsProcessed = 0;
+					uint8* ReturnParam = 0;
+
+					for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+					{
+						switch (ParamsProcessed)
+						{
+						case 0: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetKeyPtr(MapHelper.FindInternalIndex(i))); break;
+						case 1: It->CopyCompleteValueFromScriptVM(It->ContainerPtrToValuePtr<uint8>(Params), MapHelper.GetValuePtr(MapHelper.FindInternalIndex(i))); break;
+						default: ReturnParam = It->ContainerPtrToValuePtr<uint8>(Params); break;
+						}
+
+						++ParamsProcessed;
+						if (ParamsProcessed >= 3)
+							break;
+					}
+					FuncOwner->ProcessEvent(Predicate, Params);
+					if (bool* ReturnBool = (bool*)ReturnParam)
+					{
+						if (*ReturnBool)
+							OutAnyIfRetVal = true;
+					}
+				}
+
+				//Destroy Allocations
+				for (TFieldIterator<FProperty> It(Predicate); It && (It->PropertyFlags & (CPF_Parm | CPF_ReturnParm)) == CPF_Parm; ++It)
+				{
+					It->DestroyValue_InContainer(Params);
+				}
+				return true;
+			}
+		}
+		else
+		{
+			XYAH_LIB_LOG(Log, TEXT("AnyIf did not take place! Array Element count is 0!"));
+		}
+	}
+	return false;
+}
+
+bool UXyahMapLibrary::Generic_AddNew(void* TargetMap, const FMapProperty* MapProp, const void* Key, const void* Value)
 {
 	if (TargetMap &&  Key && Value)
 	{

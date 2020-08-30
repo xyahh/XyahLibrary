@@ -33,11 +33,12 @@ private:
 
 	/*
 	Sorts the given Array via a Predicate Function gotten via its Name and Function Owner.
-	This Predicate Function will be called for every comparison. If the Function returns true, the swap will take place (i.e. out of order), else
+	This Predicate Function will be called for every comparison of two elements in the array. If the Function returns true, the swap will take place (i.e. out of order), else
 	there will be no swap.
 	
 	The format of the Function should be as follows:
-	[INPUT] Array Element Type, Array Element Type
+	[INPUT] Array Element Type
+	[INPUT] Array Element Type
 	[OUTPUT] Bool Type
 
 	@param Array - The Array to Sort.
@@ -97,11 +98,11 @@ private:
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
 
-	@param bOutAnyIfReturn - The return value of the AnyIf process
+	@param bEvaluation - The return value of the AnyIf process
 	@return [bool] Whether AnyIf actually took place or there was an error processing it.
 	*/
-	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Array", meta = (DisplayName = "Any If", ArrayParm = "Array", AdvancedDisplay = "FunctionOwner"))
-	static bool BP_AnyIf(const TArray<int32>& Array, bool& bOutAnyIfReturn, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Array", meta = (DisplayName = "Any If", ReturnDisplayName = "Valid Predicate", ArrayParm = "Array", AdvancedDisplay = "FunctionOwner"))
+	static bool BP_AnyIf(const TArray<int32>& Array, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
 
 	/*
 	Returns true if ALL given array elements satisfy the Predicate Function set via its Name and Function Owner.
@@ -115,11 +116,11 @@ private:
 	@param PredicateFunctionName - The Name of the Function to call. This Function must be local (if FunctionOwner is null) or from the Function Owner (if specified)
 	@param FunctionOwner - The owner of the Predicate Function to call. If null, the Function will be searched locally.
 
-	@param bOutAllIfReturn - The return value of the AllIf process
+	@param bEvaluation - The return value of the AllIf process
 	@return [bool] Whether AllIf actually took place or there was an error processing it.
 	*/
-	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Array", meta = (DisplayName = "All If", ArrayParm = "Array", AdvancedDisplay = "FunctionOwner"))
-	static bool BP_AllIf(const TArray<int32>& Array, bool& bOutAllIfReturn, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
+	UFUNCTION(BlueprintCallable, CustomThunk, Category = "XyahLibrary|Array", meta = (DisplayName = "All If", ReturnDisplayName = "Valid Predicate", ArrayParm = "Array", AdvancedDisplay = "FunctionOwner"))
+	static bool BP_AllIf(const TArray<int32>& Array, bool& bEvaluation, FName PredicateFunctionName, UObject* FunctionOwner = nullptr);
 	
 //C++ & Blueprint
 public:

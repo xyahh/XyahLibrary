@@ -20,6 +20,26 @@ class XYAHLIBRARY_API UXyahMathLibrary : public UBlueprintFunctionLibrary
 //C++ & Blueprint
 public:
 
+	//Converts Unreal Units Per Second (cm/s) to Kilometers per Hour (Km/h)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math", meta = (ReturnDisplayName = "Km/h"))
+	static float GetKmH(float CmPerSecond);
+
+	//Converts Unreal Units Per Second (cm/s) to Miles per Hour (Mph)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math", meta = (ReturnDisplayName = "Mph"))
+	static float GetMph(float CmPerSecond);
+
+	//Converts Kilometers per Hour (Km/h) to Unreal Units Per Second (cm/s)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math", meta = (ReturnDisplayName = "Cm/s"))
+	static float FromKmH(float KmPerHour);
+
+	//Converts Miles per Hour (Mph) to Unreal Units Per Second (cm/s)
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math", meta = (ReturnDisplayName = "Cm/s"))
+	static float FromMph(float MilesPerHour);
+
+	UFUNCTION(BlueprintPure, Category = "XyahLibrary|Math", meta = (AutoCreateRefTerm = "StartLocation,Direction,Distance"))
+	static void GetTracePoints(const FVector& StartLocation, const FVector& Direction, float Distance, FVector& TraceStart, FVector& TraceEnd);
+
+
 	/*
 	Converts a given Integer Number to a String expressing it in Binary Form
 	@param Number - the Decimal Number to convert to Binary

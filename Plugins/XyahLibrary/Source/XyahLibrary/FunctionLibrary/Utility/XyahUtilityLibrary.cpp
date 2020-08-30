@@ -32,6 +32,7 @@ void UXyahUtilityLibrary::GetSettings(TSubclassOf<UXyahSettings> SettingsClass, 
 	OutSettings = GetMutableDefault<UXyahSettings>(SettingsClass);
 }
 
+
 void UXyahUtilityLibrary::StatFPS(float& FPS, float& Milliseconds)
 {
 #if WITH_ENGINE

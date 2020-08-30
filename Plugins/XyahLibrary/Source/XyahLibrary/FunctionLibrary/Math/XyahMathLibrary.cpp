@@ -1,6 +1,34 @@
 // Copyright (C), Juan Marcelo Portillo. All Rights Reserved.
 
 #include "XyahMathLibrary.h"
+#define XYAH_CMS_TO_KMH 0.036
+#define XYAH_CMS_TO_MPH 0.0223694
+
+float UXyahMathLibrary::GetKmH(float UUPerSecond)
+{
+	return UUPerSecond * XYAH_CMS_TO_KMH;
+}
+
+float UXyahMathLibrary::GetMph(float UUPerSecond)
+{
+	return UUPerSecond * XYAH_CMS_TO_MPH;
+}
+
+float UXyahMathLibrary::FromKmH(float KmPerHour)
+{
+	return KmPerHour * (1.f / XYAH_CMS_TO_KMH);
+}
+
+float UXyahMathLibrary::FromMph(float MilesPerHour)
+{
+	return MilesPerHour * (1.f / XYAH_CMS_TO_MPH);
+}
+
+void UXyahMathLibrary::GetTracePoints(const FVector& StartLocation, const FVector& Direction, float Distance, FVector& TraceStart, FVector& TraceEnd)
+{
+	TraceStart = StartLocation;
+	TraceEnd = StartLocation + Distance * Direction;
+}
 
 FString UXyahMathLibrary::ToBinaryString(int32 Number, bool bIncludeLeftZeros)
 {

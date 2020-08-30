@@ -13,6 +13,26 @@ bool UXyahGameLibrary::BP_GetAllActorsOfClass(const UObject* WorldContextObject,
 	XYAH_SHOULD_NEVER_HIT_THIS(false);
 }
 
+void UXyahGameLibrary::CloneActor(AActor* ActorToClone, AActor*& CloneResult)
+{
+	if (IsValid(ActorToClone))
+		XYAH(Game) CloneActorWithTransform(ActorToClone, ActorToClone->GetActorTransform(), CloneResult);	
+}
+
+void UXyahGameLibrary::CloneActorWithTransform(AActor* ActorToClone, const FTransform& Transform, AActor*& CloneResult)
+{
+	if (IsValid(ActorToClone))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Template = ActorToClone;
+		const bool bTemplateNetStartup = ActorToClone->bNetStartup;
+
+		//This might be a level-loaded actor so we are changing it temporarily to False for the new actor to be bNetStartup=false
+		ActorToClone->bNetStartup = false;
+		CloneResult = ActorToClone->GetWorld()->SpawnActor(ActorToClone->GetClass(), &Transform, SpawnParams);
+	}
+}
+
 EXyahNetRole UXyahGameLibrary::GetLocalRole(UObject* Object)
 {
 	if (AActor* Actor = Cast<AActor>(Object))

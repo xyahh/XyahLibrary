@@ -216,7 +216,37 @@ FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_FindIf)
 	
 }
 
-FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_SafeAdd)
+FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_AnyIf)
+{
+	XYAH_GET_PROPERTY_AND_ADDRESS(FMapProperty, MapAddr, MapProperty);
+	XYAH_CHECK_ARRAY_PROPERTY(MapProperty);
+
+	P_GET_PROPERTY_REF(FBoolProperty, OutRetVal);
+	P_GET_PROPERTY(FNameProperty, PredicateFunctionName);
+	P_GET_PROPERTY(FObjectProperty, FunctionOwner);
+
+	P_FINISH;
+	P_NATIVE_BEGIN;
+	XYAH_RETURN(bool, Generic_AnyIf(MapAddr, MapProperty, OutRetVal, (FunctionOwner) ? FunctionOwner : XYAH_GET_OBJECT, PredicateFunctionName));
+	P_NATIVE_END;
+}
+
+FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_AllIf)
+{
+	XYAH_GET_PROPERTY_AND_ADDRESS(FMapProperty, MapAddr, MapProperty);
+	XYAH_CHECK_ARRAY_PROPERTY(MapProperty);
+
+	P_GET_PROPERTY_REF(FBoolProperty, OutRetVal);
+	P_GET_PROPERTY(FNameProperty, PredicateFunctionName);
+	P_GET_PROPERTY(FObjectProperty, FunctionOwner);
+
+	P_FINISH;
+	P_NATIVE_BEGIN;
+	XYAH_RETURN(bool, Generic_AllIf(MapAddr, MapProperty, OutRetVal, (FunctionOwner) ? FunctionOwner : XYAH_GET_OBJECT, PredicateFunctionName));
+	P_NATIVE_END;
+}
+
+FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_AddNew)
 {
 	XYAH_GET_PROPERTY_AND_ADDRESS(FMapProperty, MapAddr, MapProperty);
 	XYAH_CHECK_ARRAY_PROPERTY(MapProperty);
@@ -230,7 +260,7 @@ FORCEINLINE DEFINE_FUNCTION(UXyahMapLibrary::execBP_SafeAdd)
 	P_FINISH;
 
 	P_NATIVE_BEGIN;
-	XYAH_RETURN(bool, Generic_SafeAdd(MapAddr, MapProperty, KeyData, ValueData));
+	XYAH_RETURN(bool, Generic_AddNew(MapAddr, MapProperty, KeyData, ValueData));
 	XYAH_MARK_PROPERTY_DIRTY(MapProperty);
 	P_NATIVE_END;
 }
